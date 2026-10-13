@@ -1,27 +1,24 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import { pool } from '../db/pool';
 
 const router = Router();
 
-router.get('/health', async (_req: Request, res: Response) => {
+router.get('/health', async (_req, res) => {
+  const timestamp = new Date().toISOString();
+
   try {
-    const result = await pool.query('SELECT 1 AS status, PostGIS_Version() AS postgis_version;');
-    return res.status(200).json({
+    const { rows } = await pool.query<{ postgis: string }>('SELECT PostGIS_Version() AS postgis');
+    res.json({
       status: 'ok',
-      timestamp: new Date().toISOString(),
-      database: {
-        connected: true,
-        postgis: result.rows[0]?.postgis_version || 'unknown',
-      },
+      timestamp,
+      database: { connected: true, postgis: rows[0].postgis },
     });
-  } catch (error) {
-    return res.status(503).json({
+  } catch (err) {
+    console.error('Health check fallido', err);
+    res.status(503).json({
       status: 'degraded',
-      timestamp: new Date().toISOString(),
-      database: {
-        connected: false,
-        error: error instanceof Error ? error.message : 'Database error',
-      },
+      timestamp,
+      database: { connected: false },
     });
   }
 });

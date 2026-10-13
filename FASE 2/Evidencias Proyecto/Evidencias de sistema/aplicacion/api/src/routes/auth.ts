@@ -1,200 +1,122 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { rateLimit } from 'express-rate-limit';
+import { z } from 'zod';
 import { pool } from '../db/pool';
 import { env } from '../config/env';
-import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth } from '../middleware/auth';
+import { HttpError, isUniqueViolation } from '../lib/errors';
+import { parse } from '../lib/validation';
 
 const router = Router();
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SALT_ROUNDS = 10;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const REQUIRED = 'Todos los campos son obligatorios';
+const DUMMY_HASH = bcrypt.hashSync('contrasena-inexistente', SALT_ROUNDS);
 
-router.post('/auth/register', async (req: Request, res: Response) => {
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  skipSuccessfulRequests: true,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { error: 'Demasiados intentos. Intenta de nuevo en unos minutos' },
+});
+
+const requiredText = z.string({ error: REQUIRED }).trim().min(1, REQUIRED);
+
+const registerBody = z.object({
+  email: requiredText
+    .toLowerCase()
+    .max(255, 'El formato del correo electrónico no es válido')
+    .regex(EMAIL_REGEX, 'El formato del correo electrónico no es válido'),
+  nombre_completo: requiredText.max(150, 'El nombre completo no puede superar los 150 caracteres'),
+  password: z
+    .string({ error: REQUIRED })
+    .min(1, REQUIRED)
+    .refine(
+      (value) => value.length >= 8 && /[a-zA-Z]/.test(value) && /[0-9]/.test(value),
+      'La contraseña debe tener al menos 8 caracteres e incluir letras y números'
+    )
+    .refine(
+      (value) => Buffer.byteLength(value) <= 72,
+      'La contraseña no puede superar los 72 caracteres'
+    ),
+});
+
+const loginBody = z.object({
+  email: requiredText.toLowerCase(),
+  password: z.string().min(1),
+});
+
+router.post('/auth/register', authLimiter, async (req, res) => {
+  const { email, nombre_completo, password } = parse(registerBody, req.body);
+  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+
   try {
-    const rawEmail = req.body?.email;
-    const rawPassword = req.body?.password;
-    const rawNombre = req.body?.nombre_completo ?? req.body?.nombre;
-
-    if (typeof rawEmail !== 'string' || typeof rawPassword !== 'string' || typeof rawNombre !== 'string') {
-      return res.status(400).json({
-        error: 'Todos los campos son obligatorios',
-      });
-    }
-
-    const email = rawEmail.trim().toLowerCase();
-    const nombreCompleto = rawNombre.trim();
-
-    if (!email || !nombreCompleto || !rawPassword) {
-      return res.status(400).json({
-        error: 'Todos los campos son obligatorios',
-      });
-    }
-
-    if (email.length > 255 || !EMAIL_REGEX.test(email)) {
-      return res.status(400).json({
-        error: 'El formato del correo electrónico no es válido',
-      });
-    }
-
-    if (nombreCompleto.length > 150) {
-      return res.status(400).json({
-        error: 'El nombre completo no puede superar los 150 caracteres',
-      });
-    }
-
-    const hasValidLength = rawPassword.length >= 8;
-    const hasLetter = /[a-zA-Z]/.test(rawPassword);
-    const hasNumber = /[0-9]/.test(rawPassword);
-
-    if (!hasValidLength || !hasLetter || !hasNumber) {
-      return res.status(400).json({
-        error: 'La contraseña debe tener al menos 8 caracteres e incluir letras y números',
-      });
-    }
-
-    const existingUser = await pool.query(
-      'SELECT id FROM usuarios WHERE email = $1 LIMIT 1',
-      [email]
-    );
-
-    if (existingUser.rowCount && existingUser.rowCount > 0) {
-      return res.status(409).json({
-        error: 'El correo electrónico ya está registrado',
-      });
-    }
-
-    const passwordHash = await bcrypt.hash(rawPassword, SALT_ROUNDS);
-
-    const insertResult = await pool.query(
+    const { rows } = await pool.query(
       `INSERT INTO usuarios (email, password_hash, nombre_completo)
        VALUES ($1, $2, $3)
        RETURNING id, email, nombre_completo, created_at`,
-      [email, passwordHash, nombreCompleto]
+      [email, passwordHash, nombre_completo]
     );
-
-    return res.status(201).json({
-      user: insertResult.rows[0],
-    });
-  } catch (error: unknown) {
-    if (typeof error === 'object' && error !== null && 'code' in error && (error as { code?: string }).code === '23505') {
-      return res.status(409).json({
-        error: 'El correo electrónico ya está registrado',
-      });
+    res.status(201).json({ user: rows[0] });
+  } catch (err) {
+    if (isUniqueViolation(err)) {
+      throw new HttpError(409, 'El correo electrónico ya está registrado');
     }
-
-    return res.status(500).json({
-      error: 'Error interno al registrar el usuario',
-    });
+    throw err;
   }
 });
 
-router.post('/auth/login', async (req: Request, res: Response) => {
-  try {
-    const rawEmail = req.body?.email;
-    const rawPassword = req.body?.password;
-
-    if (typeof rawEmail !== 'string' || typeof rawPassword !== 'string') {
-      return res.status(401).json({
-        error: 'Credenciales inválidas',
-      });
-    }
-
-    const email = rawEmail.trim().toLowerCase();
-
-    if (!email || !rawPassword) {
-      return res.status(401).json({
-        error: 'Credenciales inválidas',
-      });
-    }
-
-    const result = await pool.query(
-      `SELECT id, email, password_hash, nombre_completo, created_at
-       FROM usuarios
-       WHERE email = $1
-       LIMIT 1`,
-      [email]
-    );
-
-    const user = result.rows[0];
-
-    if (!user) {
-      return res.status(401).json({
-        error: 'Credenciales inválidas',
-      });
-    }
-
-    const isPasswordValid = await bcrypt.compare(rawPassword, user.password_hash);
-
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        error: 'Credenciales inválidas',
-      });
-    }
-
-    if (!env.jwt.secret) {
-      return res.status(500).json({
-        error: 'Error interno de autenticación',
-      });
-    }
-
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      env.jwt.secret,
-      { expiresIn: env.jwt.expiresIn as jwt.SignOptions['expiresIn'] }
-    );
-
-    return res.status(200).json({
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        nombre_completo: user.nombre_completo,
-        created_at: user.created_at,
-      },
-    });
-  } catch {
-    return res.status(500).json({
-      error: 'Error interno al iniciar sesión',
-    });
+router.post('/auth/login', authLimiter, async (req, res) => {
+  const credentials = loginBody.safeParse(req.body);
+  if (!credentials.success) {
+    throw new HttpError(401, 'Credenciales inválidas');
   }
+  const { email, password } = credentials.data;
+
+  const { rows } = await pool.query(
+    `SELECT id, email, password_hash, nombre_completo, created_at
+     FROM usuarios
+     WHERE email = $1`,
+    [email]
+  );
+  const user = rows[0];
+
+  const passwordMatches = await bcrypt.compare(password, user?.password_hash ?? DUMMY_HASH);
+  if (!user || !passwordMatches) {
+    throw new HttpError(401, 'Credenciales inválidas');
+  }
+
+  const token = jwt.sign({ id: user.id, email: user.email }, env.jwt.secret, {
+    algorithm: 'HS256',
+    expiresIn: env.jwt.expiresIn as jwt.SignOptions['expiresIn'],
+  });
+
+  res.json({
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      nombre_completo: user.nombre_completo,
+      created_at: user.created_at,
+    },
+  });
 });
 
-router.get('/auth/me', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
+router.get('/auth/me', requireAuth, async (req, res) => {
+  const { rows } = await pool.query(
+    'SELECT id, email, nombre_completo, created_at FROM usuarios WHERE id = $1',
+    [req.userId]
+  );
 
-    if (!userId) {
-      return res.status(401).json({
-        error: 'No autorizado',
-      });
-    }
-
-    const result = await pool.query(
-      `SELECT id, email, nombre_completo, created_at
-       FROM usuarios
-       WHERE id = $1
-       LIMIT 1`,
-      [userId]
-    );
-
-    const user = result.rows[0];
-
-    if (!user) {
-      return res.status(401).json({
-        error: 'No autorizado',
-      });
-    }
-
-    return res.status(200).json({
-      user,
-    });
-  } catch {
-    return res.status(500).json({
-      error: 'Error interno al obtener el perfil',
-    });
+  if (!rows[0]) {
+    throw new HttpError(401, 'No autorizado');
   }
+  res.json({ user: rows[0] });
 });
 
 export default router;
-

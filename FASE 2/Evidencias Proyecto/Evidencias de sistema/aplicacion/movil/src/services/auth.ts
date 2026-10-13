@@ -1,93 +1,22 @@
-import { Platform } from 'react-native';
 import { API_CONFIG } from '../config/api';
+import { request } from './http';
+import { saveSession } from './session';
+import type { AuthSession, AuthUser } from './session';
 
-export interface AuthUser {
-  id: number;
-  email: string;
-  nombre_completo: string;
-  created_at?: string;
-}
+export { clearSession, getSession, saveSession } from './session';
+export type { AuthSession, AuthUser } from './session';
 
-export interface AuthSession {
-  token: string;
-  user: AuthUser;
-}
-
-const TOKEN_KEY = 'meinpets_auth_token';
-const USER_KEY = 'meinpets_auth_user';
-
-let memorySession: AuthSession | null = null;
-
-function canUseWebStorage(): boolean {
-  return Platform.OS === 'web' && typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
-}
-
-export async function saveSession(session: AuthSession): Promise<void> {
-  memorySession = session;
-  if (canUseWebStorage()) {
-    try {
-      window.localStorage.setItem(TOKEN_KEY, session.token);
-      window.localStorage.setItem(USER_KEY, JSON.stringify(session.user));
-    } catch {
-      return;
-    }
-  }
-}
-
-export async function getSession(): Promise<AuthSession | null> {
-  if (memorySession) {
-    return memorySession;
-  }
-
-  if (canUseWebStorage()) {
-    try {
-      const token = window.localStorage.getItem(TOKEN_KEY);
-      const rawUser = window.localStorage.getItem(USER_KEY);
-      if (token && rawUser) {
-        const user = JSON.parse(rawUser) as AuthUser;
-        memorySession = { token, user };
-        return memorySession;
-      }
-    } catch {
-      return null;
-    }
-  }
-
-  return null;
-}
-
-export async function clearSession(): Promise<void> {
-  memorySession = null;
-  if (canUseWebStorage()) {
-    try {
-      window.localStorage.removeItem(TOKEN_KEY);
-      window.localStorage.removeItem(USER_KEY);
-    } catch {
-      return;
-    }
-  }
-}
+const { LOGIN, REGISTER, ME } = API_CONFIG.ENDPOINTS.AUTH;
 
 export async function loginRequest(email: string, password: string): Promise<AuthSession> {
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.LOGIN}`, {
+  const { token, user } = await request<AuthSession>(LOGIN, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
+    body: { email, password },
+    auth: false,
+    fallbackError: 'No fue posible iniciar sesión',
   });
 
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'No fue posible iniciar sesión');
-  }
-
-  const session: AuthSession = {
-    token: data.token,
-    user: data.user,
-  };
-
+  const session = { token, user };
   await saveSession(session);
   return session;
 }
@@ -97,40 +26,19 @@ export async function registerRequest(
   email: string,
   password: string
 ): Promise<AuthUser> {
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.REGISTER}`, {
+  const { user } = await request<{ user: AuthUser }>(REGISTER, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      nombre_completo: nombreCompleto,
-      email,
-      password,
-    }),
+    body: { nombre_completo: nombreCompleto, email, password },
+    auth: false,
+    fallbackError: 'No fue posible completar el registro',
   });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'No fue posible completar el registro');
-  }
-
-  return data.user as AuthUser;
+  return user;
 }
 
 export async function fetchProfileRequest(token: string): Promise<AuthUser> {
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.ME}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  const { user } = await request<{ user: AuthUser }>(ME, {
+    token,
+    fallbackError: 'Sesión expirada',
   });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Sesión expirada');
-  }
-
-  return data.user as AuthUser;
+  return user;
 }

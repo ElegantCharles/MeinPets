@@ -1,5 +1,5 @@
 import { API_CONFIG } from '../config/api';
-import { getSession } from './auth';
+import { request } from './http';
 
 export interface Breed {
   id: number;
@@ -47,6 +47,8 @@ export interface PetFormPayload {
   foto_url?: string | null;
 }
 
+const { SPECIES, PETS } = API_CONFIG.ENDPOINTS;
+
 export function formatPetAge(fechaNacimiento: string): string {
   const parts = fechaNacimiento.split('-').map(Number);
   if (parts.length !== 3 || parts.some(isNaN)) {
@@ -88,121 +90,58 @@ export function formatPetAge(fechaNacimiento: string): string {
   return `${yearLabel} y ${monthLabel}`;
 }
 
-async function getAuthHeaders(): Promise<Record<string, string>> {
-  const session = await getSession();
-  if (!session?.token) {
-    throw new Error('Tu sesión ha expirado. Inicia sesión nuevamente.');
-  }
-  return {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${session.token}`,
-  };
-}
-
 export async function fetchSpeciesCatalog(): Promise<Species[]> {
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SPECIES.LIST}`);
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'No se pudo cargar el catálogo de especies');
-  }
-
-  return (data.species || []) as Species[];
+  const { species } = await request<{ species?: Species[] }>(SPECIES.LIST, {
+    auth: false,
+    fallbackError: 'No se pudo cargar el catálogo de especies',
+  });
+  return species ?? [];
 }
 
 export async function fetchPets(): Promise<Pet[]> {
-  const headers = await getAuthHeaders();
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PETS.LIST}`, {
-    method: 'GET',
-    headers,
+  const { pets } = await request<{ pets?: Pet[] }>(PETS.LIST, {
+    fallbackError: 'No se pudo obtener el listado de mascotas',
   });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'No se pudo obtener el listado de mascotas');
-  }
-
-  return (data.pets || []) as Pet[];
+  return pets ?? [];
 }
 
 export async function fetchPetById(id: number): Promise<Pet> {
-  const headers = await getAuthHeaders();
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PETS.DETAIL(id)}`, {
-    method: 'GET',
-    headers,
+  const { pet } = await request<{ pet: Pet }>(PETS.DETAIL(id), {
+    fallbackError: 'No se pudo cargar la ficha de la mascota',
   });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'No se pudo cargar la ficha de la mascota');
-  }
-
-  return data.pet as Pet;
+  return pet;
 }
 
 export async function createPet(payload: PetFormPayload): Promise<Pet> {
-  const headers = await getAuthHeaders();
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PETS.LIST}`, {
+  const { pet } = await request<{ pet: Pet }>(PETS.LIST, {
     method: 'POST',
-    headers,
-    body: JSON.stringify(payload),
+    body: payload,
+    fallbackError: 'No se pudo registrar la mascota',
   });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'No se pudo registrar la mascota');
-  }
-
-  return data.pet as Pet;
+  return pet;
 }
 
 export async function updatePet(id: number, payload: PetFormPayload): Promise<Pet> {
-  const headers = await getAuthHeaders();
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PETS.DETAIL(id)}`, {
+  const { pet } = await request<{ pet: Pet }>(PETS.DETAIL(id), {
     method: 'PUT',
-    headers,
-    body: JSON.stringify(payload),
+    body: payload,
+    fallbackError: 'No se pudo actualizar la mascota',
   });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'No se pudo actualizar la mascota');
-  }
-
-  return data.pet as Pet;
+  return pet;
 }
 
 export async function deletePet(id: number): Promise<void> {
-  const headers = await getAuthHeaders();
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PETS.DETAIL(id)}`, {
+  await request(PETS.DETAIL(id), {
     method: 'DELETE',
-    headers,
+    fallbackError: 'No se pudo eliminar la mascota',
   });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'No se pudo eliminar la mascota');
-  }
 }
 
 export async function addPetTutor(id: number, email: string): Promise<Pet> {
-  const headers = await getAuthHeaders();
-  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PETS.TUTORS(id)}`, {
+  const { pet } = await request<{ pet: Pet }>(PETS.TUTORS(id), {
     method: 'POST',
-    headers,
-    body: JSON.stringify({ email }),
+    body: { email },
+    fallbackError: 'No se pudo asociar al cotutor',
   });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'No se pudo asociar al cotutor');
-  }
-
-  return data.pet as Pet;
+  return pet;
 }

@@ -19,7 +19,6 @@ import {
   fetchPetTreatments,
   createPetTreatment,
   updatePetTreatment,
-  getTodayIsoDate,
   computeSuggestedBoosterDate,
 } from '../services/treatments';
 import {
@@ -47,6 +46,7 @@ import {
   formatRelativeDays,
   parseIso,
   radii,
+  todayIso,
   type as t,
 } from '../theme';
 
@@ -86,7 +86,7 @@ export default function TreatmentFormScreen({ navigation, route }: TreatmentForm
   const [catalog, setCatalog] = useState<TreatmentCatalogItem[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<TreatmentCategory | 'all'>('all');
   const [selectedTreatmentId, setSelectedTreatmentId] = useState<number | null>(null);
-  const [fechaAplicacion, setFechaAplicacion] = useState<string>(getTodayIsoDate());
+  const [fechaAplicacion, setFechaAplicacion] = useState<string>(todayIso());
   const [fechaProximoRefuerzo, setFechaProximoRefuerzo] = useState<string>('');
   const [manualBoosterEdited, setManualBoosterEdited] = useState<boolean>(false);
   const [loteProducto, setLoteProducto] = useState<string>('');
@@ -130,7 +130,7 @@ export default function TreatmentFormScreen({ navigation, route }: TreatmentForm
           const first = items[0];
           setSelectedTreatmentId(first.id);
           setFechaProximoRefuerzo(
-            computeSuggestedBoosterDate(getTodayIsoDate(), first.intervalo_refuerzo_dias)
+            computeSuggestedBoosterDate(todayIso(), first.intervalo_refuerzo_dias)
           );
         }
       } catch (error) {
@@ -181,7 +181,7 @@ export default function TreatmentFormScreen({ navigation, route }: TreatmentForm
 
   const handleQuickDate = (ago: number) => {
     setCustomDateOpen(false);
-    handleChangeFechaAplicacion(addDaysIso(getTodayIsoDate(), -ago));
+    handleChangeFechaAplicacion(addDaysIso(todayIso(), -ago));
   };
 
   const handleChangeBoosterManual = (value: string) => {
@@ -194,7 +194,7 @@ export default function TreatmentFormScreen({ navigation, route }: TreatmentForm
       ? fechaProximoRefuerzo
       : parseIso(fechaAplicacion)
       ? fechaAplicacion
-      : getTodayIsoDate();
+      : todayIso();
     setFechaProximoRefuerzo(addDaysIso(base, days));
     setManualBoosterEdited(true);
   };
