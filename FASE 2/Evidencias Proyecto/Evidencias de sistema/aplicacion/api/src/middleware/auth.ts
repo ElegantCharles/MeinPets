@@ -1,51 +1,23 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import type { RequestHandler } from 'express';
+import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
+import { HttpError } from '../lib/errors';
 
-export interface AuthUserPayload {
-  id: number;
-  email: string;
-}
-
-export interface AuthenticatedRequest extends Request {
-  user?: AuthUserPayload;
-}
-
-export function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({
-      error: 'No autorizado',
-    });
-  }
-
-  const token = authHeader.slice(7).trim();
-
-  if (!token || !env.jwt.secret) {
-    return res.status(401).json({
-      error: 'No autorizado',
-    });
+export const requireAuth: RequestHandler = (req, _res, next) => {
+  const header = req.headers.authorization;
+  if (!header?.startsWith('Bearer ')) {
+    throw new HttpError(401, 'No autorizado');
   }
 
   try {
-    const decoded = jwt.verify(token, env.jwt.secret) as JwtPayload;
-
-    if (typeof decoded !== 'object' || decoded === null || typeof decoded.id !== 'number' || typeof decoded.email !== 'string') {
-      return res.status(401).json({
-        error: 'Token inválido o expirado',
-      });
+    const payload = jwt.verify(header.slice(7).trim(), env.jwt.secret, { algorithms: ['HS256'] });
+    if (typeof payload === 'string' || typeof payload.id !== 'number') {
+      throw new Error('Token sin identificador');
     }
-
-    req.user = {
-      id: decoded.id,
-      email: decoded.email,
-    };
-
-    return next();
+    req.userId = payload.id;
   } catch {
-    return res.status(401).json({
-      error: 'Token inválido o expirado',
-    });
+    throw new HttpError(401, 'Token inválido o expirado');
   }
-}
+
+  next();
+};

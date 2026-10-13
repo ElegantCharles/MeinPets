@@ -1,34 +1,26 @@
-import express from 'express';
-import cors from 'cors';
 import { env } from './config/env';
-import { ensureDatabaseInitialized } from './db/init';
-import healthRouter from './routes/health';
-import authRouter from './routes/auth';
-import petsRouter from './routes/pets';
-import treatmentsRouter from './routes/treatments';
+import { pool } from './db/pool';
+import { migrate } from './db/migrate';
+import { createApp } from './app';
 
-const app = express();
+async function main() {
+  await migrate();
 
-app.use(cors());
-app.use(express.json());
-
-app.use(healthRouter);
-app.use(authRouter);
-app.use(petsRouter);
-app.use(treatmentsRouter);
-app.use('/api', healthRouter);
-app.use('/api', authRouter);
-app.use('/api', petsRouter);
-app.use('/api', treatmentsRouter);
-
-ensureDatabaseInitialized()
-  .catch((err) => {
-    console.error('Database initialization warning:', err);
-  })
-  .finally(() => {
-    app.listen(env.port, () => {
-      console.log(`Server listening on port ${env.port}`);
-    });
+  const server = createApp().listen(env.port, () => {
+    console.log(`API escuchando en el puerto ${env.port}`);
   });
 
-export default app;
+  const shutdown = () => {
+    server.close(() => {
+      pool.end().finally(() => process.exit(0));
+    });
+  };
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
+}
+
+main().catch((err) => {
+  console.error('No se pudo iniciar la API', err);
+  process.exit(1);
+});

@@ -1,520 +1,210 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
+import { z } from 'zod';
 import { pool } from '../db/pool';
-import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth } from '../middleware/auth';
+import { requirePetAccess, requirePrincipalTutor } from '../lib/access';
+import { HttpError } from '../lib/errors';
+import { isoDate, optionalText, parse, positiveInt, todayIso } from '../lib/validation';
 
 const router = Router();
 
-const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+router.use('/pets', requireAuth);
 
-function isValidPastOrTodayDate(dateStr: string): { valid: boolean; isFuture: boolean } {
-  if (!DATE_REGEX.test(dateStr)) {
-    return { valid: false, isFuture: false };
-  }
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const parsed = new Date(Date.UTC(year, month - 1, day));
-  if (
-    parsed.getUTCFullYear() !== year ||
-    parsed.getUTCMonth() !== month - 1 ||
-    parsed.getUTCDate() !== day
-  ) {
-    return { valid: false, isFuture: false };
-  }
+const petId = positiveInt('Identificador de mascota inválido');
 
-  const now = new Date();
-  const todayUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  if (parsed.getTime() > todayUtc) {
-    return { valid: false, isFuture: true };
-  }
+const NAME_REQUIRED = 'El nombre de la mascota es obligatorio';
+const BIRTH_REQUIRED = 'La fecha de nacimiento es obligatoria (YYYY-MM-DD)';
+const BIRTH_INVALID = 'El formato de la fecha de nacimiento no es válido (YYYY-MM-DD)';
+const SEX_INVALID = 'El sexo debe ser macho o hembra';
 
-  return { valid: true, isFuture: false };
+const petBody = z.object({
+  nombre: z
+    .string({ error: NAME_REQUIRED })
+    .trim()
+    .min(1, NAME_REQUIRED)
+    .max(100, 'El nombre no puede superar los 100 caracteres'),
+  especie_id: positiveInt('Debes seleccionar una especie válida'),
+  fecha_nacimiento: isoDate(BIRTH_REQUIRED, BIRTH_INVALID).refine(
+    (value) => value <= todayIso(),
+    'La fecha de nacimiento no puede ser una fecha futura'
+  ),
+  sexo: z
+    .string({ error: SEX_INVALID })
+    .trim()
+    .toLowerCase()
+    .pipe(z.enum(['macho', 'hembra'], { error: SEX_INVALID })),
+  numero_chip: optionalText(50, 'El número de chip no puede superar los 50 caracteres'),
+  raza_id: z.preprocess(
+    (value) => (value === undefined || value === '' ? null : value),
+    positiveInt('La raza seleccionada no es válida').nullable()
+  ),
+  esterilizado: z.preprocess(
+    (value) => value ?? false,
+    z.boolean({ error: 'El campo esterilizado debe ser verdadero o falso' })
+  ),
+  foto_url: optionalText(255, 'La URL de la foto no puede superar los 255 caracteres'),
+});
+
+type PetBody = z.output<typeof petBody>;
+
+const PET_COLUMNS = `
+  m.id, m.nombre, m.especie_id, e.nombre AS especie_nombre,
+  m.raza_id, r.nombre AS raza_nombre, m.fecha_nacimiento, m.sexo,
+  m.esterilizado, m.numero_chip, m.foto_url, um.es_tutor_principal,
+  m.created_at, m.updated_at`;
+
+const PET_FROM = `
+  FROM usuarios_mascotas um
+  JOIN mascotas m ON m.id = um.mascota_id
+  JOIN especies e ON e.id = m.especie_id
+  LEFT JOIN razas r ON r.id = m.raza_id`;
+
+const TUTORS_COLUMN = `
+  (SELECT COALESCE(
+            json_agg(
+              json_build_object(
+                'id', u.id,
+                'nombre_completo', u.nombre_completo,
+                'email', u.email,
+                'es_tutor_principal', t.es_tutor_principal
+              )
+              ORDER BY t.es_tutor_principal DESC, u.nombre_completo
+            ),
+            '[]'::json
+          )
+   FROM usuarios_mascotas t
+   JOIN usuarios u ON u.id = t.usuario_id
+   WHERE t.mascota_id = m.id) AS tutores`;
+
+function petValues(body: PetBody) {
+  return [
+    body.nombre,
+    body.especie_id,
+    body.raza_id,
+    body.fecha_nacimiento,
+    body.sexo,
+    body.esterilizado,
+    body.numero_chip,
+    body.foto_url,
+  ];
 }
 
-async function fetchEnrichedPet(petId: number, userId: number) {
-  const result = await pool.query(
-    `SELECT
-      m.id,
-      m.nombre,
-      m.especie_id,
-      e.nombre AS especie_nombre,
-      m.raza_id,
-      r.nombre AS raza_nombre,
-      TO_CHAR(m.fecha_nacimiento, 'YYYY-MM-DD') AS fecha_nacimiento,
-      m.sexo,
-      m.esterilizado,
-      m.numero_chip,
-      m.foto_url,
-      um.es_tutor_principal,
-      m.created_at,
-      m.updated_at
-    FROM usuarios_mascotas um
-    INNER JOIN mascotas m ON m.id = um.mascota_id
-    INNER JOIN especies e ON e.id = m.especie_id
-    LEFT JOIN razas r ON r.id = m.raza_id
-    WHERE um.mascota_id = $1 AND um.usuario_id = $2
-    LIMIT 1`,
-    [petId, userId]
+async function findPet(id: number, userId: number) {
+  const { rows } = await pool.query(
+    `SELECT ${PET_COLUMNS}, ${TUTORS_COLUMN}
+     ${PET_FROM}
+     WHERE um.mascota_id = $1 AND um.usuario_id = $2`,
+    [id, userId]
+  );
+  return rows[0];
+}
+
+async function assertSpeciesAndBreed(especieId: number, razaId: number | null) {
+  const { rows } = await pool.query<{ especie_existe: boolean; raza_valida: boolean }>(
+    `SELECT EXISTS (SELECT 1 FROM especies WHERE id = $1) AS especie_existe,
+            ($2::int IS NULL OR EXISTS (SELECT 1 FROM razas WHERE id = $2 AND especie_id = $1)) AS raza_valida`,
+    [especieId, razaId]
   );
 
-  const pet = result.rows[0];
+  if (!rows[0].especie_existe) {
+    throw new HttpError(400, 'La especie seleccionada no existe');
+  }
+  if (!rows[0].raza_valida) {
+    throw new HttpError(400, 'La raza no pertenece a la especie seleccionada');
+  }
+}
+
+router.get('/pets', async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT ${PET_COLUMNS}
+     ${PET_FROM}
+     WHERE um.usuario_id = $1
+     ORDER BY m.created_at DESC`,
+    [req.userId]
+  );
+  res.json({ pets: rows });
+});
+
+router.get('/pets/:id', async (req, res) => {
+  const pet = await findPet(parse(petId, req.params.id), req.userId);
   if (!pet) {
-    return null;
+    throw new HttpError(404, 'Mascota no encontrada');
   }
+  res.json({ pet });
+});
 
-  const tutorsResult = await pool.query(
-    `SELECT
-      u.id,
-      u.nombre_completo,
-      u.email,
-      um.es_tutor_principal
-    FROM usuarios_mascotas um
-    INNER JOIN usuarios u ON u.id = um.usuario_id
-    WHERE um.mascota_id = $1
-    ORDER BY um.es_tutor_principal DESC, u.nombre_completo ASC`,
-    [petId]
+router.post('/pets', async (req, res) => {
+  const body = parse(petBody, req.body);
+  await assertSpeciesAndBreed(body.especie_id, body.raza_id);
+
+  const { rows } = await pool.query<{ mascota_id: number }>(
+    `WITH nueva AS (
+       INSERT INTO mascotas
+         (nombre, especie_id, raza_id, fecha_nacimiento, sexo, esterilizado, numero_chip, foto_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id
+     )
+     INSERT INTO usuarios_mascotas (usuario_id, mascota_id, es_tutor_principal)
+     SELECT $9::int, id, TRUE FROM nueva
+     RETURNING mascota_id`,
+    [...petValues(body), req.userId]
   );
 
-  return {
-    ...pet,
-    tutores: tutorsResult.rows,
-  };
-}
-
-router.get('/species', async (_req: Request, res: Response) => {
-  try {
-    const speciesResult = await pool.query(
-      'SELECT id, nombre FROM especies ORDER BY id ASC'
-    );
-    const breedsResult = await pool.query(
-      'SELECT id, especie_id, nombre FROM razas ORDER BY nombre ASC'
-    );
-
-    const species = speciesResult.rows.map((sp) => ({
-      id: sp.id,
-      nombre: sp.nombre,
-      razas: breedsResult.rows.filter((br) => br.especie_id === sp.id),
-    }));
-
-    return res.status(200).json({ species });
-  } catch {
-    return res.status(500).json({
-      error: 'Error al obtener el catálogo de especies y razas',
-    });
-  }
+  res.status(201).json({ pet: await findPet(rows[0].mascota_id, req.userId) });
 });
 
-router.get('/species/:id/breeds', async (req: Request, res: Response) => {
-  try {
-    const especieId = Number(req.params.id);
-    if (!Number.isInteger(especieId) || especieId <= 0) {
-      return res.status(400).json({
-        error: 'Identificador de especie inválido',
-      });
-    }
+router.put('/pets/:id', async (req, res) => {
+  const id = parse(petId, req.params.id);
+  await requirePetAccess(id, req.userId);
 
-    const result = await pool.query(
-      'SELECT id, especie_id, nombre FROM razas WHERE especie_id = $1 ORDER BY nombre ASC',
-      [especieId]
-    );
+  const body = parse(petBody, req.body);
+  await assertSpeciesAndBreed(body.especie_id, body.raza_id);
 
-    return res.status(200).json({
-      breeds: result.rows,
-    });
-  } catch {
-    return res.status(500).json({
-      error: 'Error al obtener las razas de la especie',
-    });
-  }
+  await pool.query(
+    `UPDATE mascotas
+     SET nombre = $1, especie_id = $2, raza_id = $3, fecha_nacimiento = $4, sexo = $5,
+         esterilizado = $6, numero_chip = $7, foto_url = $8, updated_at = NOW()
+     WHERE id = $9`,
+    [...petValues(body), id]
+  );
+
+  res.json({ pet: await findPet(id, req.userId) });
 });
 
-router.get('/pets', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'No autorizado' });
-    }
+router.delete('/pets/:id', async (req, res) => {
+  const id = parse(petId, req.params.id);
+  await requirePrincipalTutor(id, req.userId);
 
-    const result = await pool.query(
-      `SELECT
-        m.id,
-        m.nombre,
-        m.especie_id,
-        e.nombre AS especie_nombre,
-        m.raza_id,
-        r.nombre AS raza_nombre,
-        TO_CHAR(m.fecha_nacimiento, 'YYYY-MM-DD') AS fecha_nacimiento,
-        m.sexo,
-        m.esterilizado,
-        m.numero_chip,
-        m.foto_url,
-        um.es_tutor_principal,
-        m.created_at,
-        m.updated_at
-      FROM usuarios_mascotas um
-      INNER JOIN mascotas m ON m.id = um.mascota_id
-      INNER JOIN especies e ON e.id = m.especie_id
-      LEFT JOIN razas r ON r.id = m.raza_id
-      WHERE um.usuario_id = $1
-      ORDER BY m.created_at DESC`,
-      [userId]
-    );
-
-    return res.status(200).json({
-      pets: result.rows,
-    });
-  } catch {
-    return res.status(500).json({
-      error: 'Error al listar las mascotas',
-    });
-  }
+  await pool.query('DELETE FROM mascotas WHERE id = $1', [id]);
+  res.json({ message: 'Mascota eliminada correctamente' });
 });
 
-router.get('/pets/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const petId = Number(req.params.id);
-
-    if (!userId) {
-      return res.status(401).json({ error: 'No autorizado' });
-    }
-
-    if (!Number.isInteger(petId) || petId <= 0) {
-      return res.status(400).json({ error: 'Identificador de mascota inválido' });
-    }
-
-    const pet = await fetchEnrichedPet(petId, userId);
-
-    if (!pet) {
-      return res.status(404).json({ error: 'Mascota no encontrada' });
-    }
-
-    return res.status(200).json({ pet });
-  } catch {
-    return res.status(500).json({
-      error: 'Error al obtener la ficha de la mascota',
-    });
-  }
+const tutorBody = z.object({
+  email: z
+    .string({ error: 'Debes indicar el correo electrónico del cotutor' })
+    .trim()
+    .toLowerCase()
+    .min(1, 'Debes indicar el correo electrónico del cotutor'),
 });
 
-router.post('/pets', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  const client = await pool.connect();
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'No autorizado' });
-    }
+router.post('/pets/:id/tutors', async (req, res) => {
+  const id = parse(petId, req.params.id);
+  const { email } = parse(tutorBody, req.body);
+  await requirePrincipalTutor(id, req.userId);
 
-    const rawNombre = req.body?.nombre;
-    const especieId = Number(req.body?.especie_id);
-    const razaId = req.body?.raza_id !== undefined && req.body?.raza_id !== null && req.body?.raza_id !== ''
-      ? Number(req.body.raza_id)
-      : null;
-    const fechaNacimiento = req.body?.fecha_nacimiento;
-    const rawSexo = req.body?.sexo;
-    const esterilizado = Boolean(req.body?.esterilizado);
-    const numeroChip = typeof req.body?.numero_chip === 'string' && req.body.numero_chip.trim()
-      ? req.body.numero_chip.trim()
-      : null;
-    const fotoUrl = typeof req.body?.foto_url === 'string' && req.body.foto_url.trim()
-      ? req.body.foto_url.trim()
-      : null;
-
-    if (typeof rawNombre !== 'string' || !rawNombre.trim()) {
-      return res.status(400).json({ error: 'El nombre de la mascota es obligatorio' });
-    }
-
-    const nombre = rawNombre.trim();
-    if (nombre.length > 100) {
-      return res.status(400).json({ error: 'El nombre no puede superar los 100 caracteres' });
-    }
-
-    if (!Number.isInteger(especieId) || especieId <= 0) {
-      return res.status(400).json({ error: 'Debes seleccionar una especie válida' });
-    }
-
-    if (typeof fechaNacimiento !== 'string' || !fechaNacimiento.trim()) {
-      return res.status(400).json({ error: 'La fecha de nacimiento es obligatoria (YYYY-MM-DD)' });
-    }
-
-    const dateCheck = isValidPastOrTodayDate(fechaNacimiento.trim());
-    if (dateCheck.isFuture) {
-      return res.status(400).json({ error: 'La fecha de nacimiento no puede ser una fecha futura' });
-    }
-    if (!dateCheck.valid) {
-      return res.status(400).json({ error: 'El formato de la fecha de nacimiento no es válido (YYYY-MM-DD)' });
-    }
-
-    const sexo = typeof rawSexo === 'string' ? rawSexo.trim().toLowerCase() : '';
-    if (sexo !== 'macho' && sexo !== 'hembra') {
-      return res.status(400).json({ error: 'El sexo debe ser macho o hembra' });
-    }
-
-    if (numeroChip && numeroChip.length > 50) {
-      return res.status(400).json({ error: 'El número de chip no puede superar los 50 caracteres' });
-    }
-
-    const spResult = await client.query('SELECT id FROM especies WHERE id = $1 LIMIT 1', [especieId]);
-    if (spResult.rowCount === 0) {
-      return res.status(400).json({ error: 'La especie seleccionada no existe' });
-    }
-
-    if (razaId !== null) {
-      if (!Number.isInteger(razaId) || razaId <= 0) {
-        return res.status(400).json({ error: 'La raza seleccionada no es válida' });
-      }
-      const brResult = await client.query(
-        'SELECT id FROM razas WHERE id = $1 AND especie_id = $2 LIMIT 1',
-        [razaId, especieId]
-      );
-      if (brResult.rowCount === 0) {
-        return res.status(400).json({ error: 'La raza no pertenece a la especie seleccionada' });
-      }
-    }
-
-    await client.query('BEGIN');
-
-    const insertPet = await client.query(
-      `INSERT INTO mascotas (
-        nombre,
-        especie_id,
-        raza_id,
-        fecha_nacimiento,
-        sexo,
-        esterilizado,
-        numero_chip,
-        foto_url
-      )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING id`,
-      [nombre, especieId, razaId, fechaNacimiento.trim(), sexo, esterilizado, numeroChip, fotoUrl]
-    );
-
-    const newPetId = insertPet.rows[0].id as number;
-
-    await client.query(
-      `INSERT INTO usuarios_mascotas (usuario_id, mascota_id, es_tutor_principal)
-       VALUES ($1, $2, TRUE)`,
-      [userId, newPetId]
-    );
-
-    await client.query('COMMIT');
-
-    const pet = await fetchEnrichedPet(newPetId, userId);
-
-    return res.status(201).json({ pet });
-  } catch {
-    await client.query('ROLLBACK').catch(() => undefined);
-    return res.status(500).json({
-      error: 'Error al registrar la mascota',
-    });
-  } finally {
-    client.release();
+  const { rows } = await pool.query<{ id: number }>('SELECT id FROM usuarios WHERE email = $1', [email]);
+  if (!rows[0]) {
+    throw new HttpError(404, 'No existe un usuario registrado con ese correo electrónico');
   }
-});
 
-router.put('/pets/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const petId = Number(req.params.id);
+  await pool.query(
+    `INSERT INTO usuarios_mascotas (usuario_id, mascota_id, es_tutor_principal)
+     VALUES ($1, $2, FALSE)
+     ON CONFLICT (usuario_id, mascota_id) DO NOTHING`,
+    [rows[0].id, id]
+  );
 
-    if (!userId) {
-      return res.status(401).json({ error: 'No autorizado' });
-    }
-
-    if (!Number.isInteger(petId) || petId <= 0) {
-      return res.status(400).json({ error: 'Identificador de mascota inválido' });
-    }
-
-    const accessCheck = await pool.query(
-      'SELECT 1 FROM usuarios_mascotas WHERE mascota_id = $1 AND usuario_id = $2 LIMIT 1',
-      [petId, userId]
-    );
-
-    if (accessCheck.rowCount === 0) {
-      return res.status(404).json({ error: 'Mascota no encontrada' });
-    }
-
-    const rawNombre = req.body?.nombre;
-    const especieId = Number(req.body?.especie_id);
-    const razaId = req.body?.raza_id !== undefined && req.body?.raza_id !== null && req.body?.raza_id !== ''
-      ? Number(req.body.raza_id)
-      : null;
-    const fechaNacimiento = req.body?.fecha_nacimiento;
-    const rawSexo = req.body?.sexo;
-    const esterilizado = Boolean(req.body?.esterilizado);
-    const numeroChip = typeof req.body?.numero_chip === 'string' && req.body.numero_chip.trim()
-      ? req.body.numero_chip.trim()
-      : null;
-    const fotoUrl = typeof req.body?.foto_url === 'string' && req.body.foto_url.trim()
-      ? req.body.foto_url.trim()
-      : null;
-
-    if (typeof rawNombre !== 'string' || !rawNombre.trim()) {
-      return res.status(400).json({ error: 'El nombre de la mascota es obligatorio' });
-    }
-
-    const nombre = rawNombre.trim();
-    if (nombre.length > 100) {
-      return res.status(400).json({ error: 'El nombre no puede superar los 100 caracteres' });
-    }
-
-    if (!Number.isInteger(especieId) || especieId <= 0) {
-      return res.status(400).json({ error: 'Debes seleccionar una especie válida' });
-    }
-
-    if (typeof fechaNacimiento !== 'string' || !fechaNacimiento.trim()) {
-      return res.status(400).json({ error: 'La fecha de nacimiento es obligatoria (YYYY-MM-DD)' });
-    }
-
-    const dateCheck = isValidPastOrTodayDate(fechaNacimiento.trim());
-    if (dateCheck.isFuture) {
-      return res.status(400).json({ error: 'La fecha de nacimiento no puede ser una fecha futura' });
-    }
-    if (!dateCheck.valid) {
-      return res.status(400).json({ error: 'El formato de la fecha de nacimiento no es válido (YYYY-MM-DD)' });
-    }
-
-    const sexo = typeof rawSexo === 'string' ? rawSexo.trim().toLowerCase() : '';
-    if (sexo !== 'macho' && sexo !== 'hembra') {
-      return res.status(400).json({ error: 'El sexo debe ser macho o hembra' });
-    }
-
-    if (numeroChip && numeroChip.length > 50) {
-      return res.status(400).json({ error: 'El número de chip no puede superar los 50 caracteres' });
-    }
-
-    const spResult = await pool.query('SELECT id FROM especies WHERE id = $1 LIMIT 1', [especieId]);
-    if (spResult.rowCount === 0) {
-      return res.status(400).json({ error: 'La especie seleccionada no existe' });
-    }
-
-    if (razaId !== null) {
-      if (!Number.isInteger(razaId) || razaId <= 0) {
-        return res.status(400).json({ error: 'La raza seleccionada no es válida' });
-      }
-      const brResult = await pool.query(
-        'SELECT id FROM razas WHERE id = $1 AND especie_id = $2 LIMIT 1',
-        [razaId, especieId]
-      );
-      if (brResult.rowCount === 0) {
-        return res.status(400).json({ error: 'La raza no pertenece a la especie seleccionada' });
-      }
-    }
-
-    await pool.query(
-      `UPDATE mascotas
-       SET nombre = $1,
-           especie_id = $2,
-           raza_id = $3,
-           fecha_nacimiento = $4,
-           sexo = $5,
-           esterilizado = $6,
-           numero_chip = $7,
-           foto_url = $8,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id = $9`,
-      [nombre, especieId, razaId, fechaNacimiento.trim(), sexo, esterilizado, numeroChip, fotoUrl, petId]
-    );
-
-    const pet = await fetchEnrichedPet(petId, userId);
-
-    return res.status(200).json({ pet });
-  } catch {
-    return res.status(500).json({
-      error: 'Error al actualizar la mascota',
-    });
-  }
-});
-
-router.delete('/pets/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const petId = Number(req.params.id);
-
-    if (!userId) {
-      return res.status(401).json({ error: 'No autorizado' });
-    }
-
-    if (!Number.isInteger(petId) || petId <= 0) {
-      return res.status(400).json({ error: 'Identificador de mascota inválido' });
-    }
-
-    const accessCheck = await pool.query(
-      'SELECT 1 FROM usuarios_mascotas WHERE mascota_id = $1 AND usuario_id = $2 LIMIT 1',
-      [petId, userId]
-    );
-
-    if (accessCheck.rowCount === 0) {
-      return res.status(404).json({ error: 'Mascota no encontrada' });
-    }
-
-    await pool.query('DELETE FROM mascotas WHERE id = $1', [petId]);
-
-    return res.status(200).json({
-      message: 'Mascota eliminada correctamente',
-    });
-  } catch {
-    return res.status(500).json({
-      error: 'Error al eliminar la mascota',
-    });
-  }
-});
-
-router.post('/pets/:id/tutors', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const petId = Number(req.params.id);
-    const rawEmail = req.body?.email;
-
-    if (!userId) {
-      return res.status(401).json({ error: 'No autorizado' });
-    }
-
-    if (!Number.isInteger(petId) || petId <= 0) {
-      return res.status(400).json({ error: 'Identificador de mascota inválido' });
-    }
-
-    if (typeof rawEmail !== 'string' || !rawEmail.trim()) {
-      return res.status(400).json({ error: 'Debes indicar el correo electrónico del cotutor' });
-    }
-
-    const accessCheck = await pool.query(
-      'SELECT 1 FROM usuarios_mascotas WHERE mascota_id = $1 AND usuario_id = $2 LIMIT 1',
-      [petId, userId]
-    );
-
-    if (accessCheck.rowCount === 0) {
-      return res.status(404).json({ error: 'Mascota no encontrada' });
-    }
-
-    const targetEmail = rawEmail.trim().toLowerCase();
-    const userLookup = await pool.query(
-      'SELECT id FROM usuarios WHERE email = $1 LIMIT 1',
-      [targetEmail]
-    );
-
-    if (userLookup.rowCount === 0) {
-      return res.status(404).json({
-        error: 'No existe un usuario registrado con ese correo electrónico',
-      });
-    }
-
-    const newTutorId = userLookup.rows[0].id as number;
-
-    await pool.query(
-      `INSERT INTO usuarios_mascotas (usuario_id, mascota_id, es_tutor_principal)
-       VALUES ($1, $2, FALSE)
-       ON CONFLICT (usuario_id, mascota_id) DO NOTHING`,
-      [newTutorId, petId]
-    );
-
-    const pet = await fetchEnrichedPet(petId, userId);
-
-    return res.status(201).json({ pet });
-  } catch {
-    return res.status(500).json({
-      error: 'Error al asociar el cotutor a la mascota',
-    });
-  }
+  res.status(201).json({ pet: await findPet(id, req.userId) });
 });
 
 export default router;
