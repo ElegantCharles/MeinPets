@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 const API_HOST = Platform.OS === 'web' ? 'localhost' : '172.20.10.5';
 
 export const API_CONFIG = {
-  BASE_URL: `http://${API_HOST}:3000/api`,
+  BASE_URL: process.env.EXPO_PUBLIC_API_URL ?? `http://${API_HOST}:3000/api`,
   TIMEOUT_MS: 10000,
   ENDPOINTS: {
     AUTH: {
