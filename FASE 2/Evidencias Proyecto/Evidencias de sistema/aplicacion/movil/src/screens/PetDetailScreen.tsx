@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -23,6 +24,7 @@ import {
   deletePetTreatment,
   getBoosterStatus,
 } from '../services/treatments';
+import { addBoosterToCalendar, calendarSupported } from '../services/calendar';
 import {
   Avatar,
   BottomSheet,
@@ -89,6 +91,13 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
   const [selectedRecord, setSelectedRecord] = useState<PetTreatmentRecord | null>(null);
   const [confirmingRecord, setConfirmingRecord] = useState(false);
   const [deletingRecordId, setDeletingRecordId] = useState<number | null>(null);
+  const [addingToCalendar, setAddingToCalendar] = useState(false);
+  const [calendarFeedback, setCalendarFeedback] = useState<{
+    type: 'ok' | 'err';
+    text: string;
+    detail?: string;
+    needsSettings?: boolean;
+  } | null>(null);
 
   const [showInvite, setShowInvite] = useState(false);
   const [coTutorEmail, setCoTutorEmail] = useState('');
@@ -120,6 +129,10 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
     });
     return unsubscribe;
   }, [navigation, loadPet]);
+
+  useEffect(() => {
+    setCalendarFeedback(null);
+  }, [selectedRecord?.id]);
 
   const goBack = () => {
     if (navigation.canGoBack()) {
@@ -200,6 +213,42 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
     }
   };
 
+  const handleAddToCalendar = async (rec: PetTreatmentRecord) => {
+    if (!pet || !rec.fecha_proximo_refuerzo) return;
+    setCalendarFeedback(null);
+    setAddingToCalendar(true);
+    try {
+      const result = await addBoosterToCalendar({
+        petName: pet.nombre,
+        treatmentName: rec.tratamiento_nombre,
+        boosterDate: rec.fecha_proximo_refuerzo.slice(0, 10),
+        intervalDays: rec.intervalo_refuerzo_dias,
+      });
+      if (result.status === 'denied') {
+        setCalendarFeedback({
+          type: 'err',
+          text: result.canAskAgain
+            ? 'Necesitamos el permiso de calendario para agregar el recordatorio. Toca de nuevo y acepta.'
+            : 'El permiso de calendario está desactivado. Actívalo en los ajustes de tu teléfono.',
+          needsSettings: !result.canAskAgain,
+        });
+      } else {
+        setCalendarFeedback({
+          type: 'ok',
+          text: result.status === 'created' ? 'Listo, quedó en tu calendario.' : 'Ya estaba en tu calendario.',
+          detail: result.calendarTitle,
+        });
+      }
+    } catch (error) {
+      setCalendarFeedback({
+        type: 'err',
+        text: error instanceof Error ? error.message : 'No se pudo agregar al calendario. Intenta de nuevo.',
+      });
+    } finally {
+      setAddingToCalendar(false);
+    }
+  };
+
   const handleAddTutor = async () => {
     setTutorFeedback(null);
     const trimmed = coTutorEmail.trim().toLowerCase();
@@ -265,6 +314,11 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
   const breed = pet.raza_nombre || `${pet.especie_nombre} mestizo`;
   const sterilized = pet.sexo === 'macho' ? 'Esterilizado' : 'Esterilizada';
   const hasDoses = sortedTreatments.length > 0;
+  const canAddToCalendar =
+    calendarSupported &&
+    selectedRecord !== null &&
+    latestIds.has(selectedRecord.id) &&
+    (daysFromToday(selectedRecord.fecha_proximo_refuerzo) ?? -1) >= 0;
 
   /* -------------------------------------------------------------- pantalla */
 
@@ -612,6 +666,37 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
                 <DetailLine label="Lote o marca" value={selectedRecord.lote_producto} />
               ) : null}
               {selectedRecord.notas ? <DetailLine label="Notas" value={selectedRecord.notas} /> : null}
+              {canAddToCalendar ? (
+                <View style={{ gap: 10, paddingTop: 6 }}>
+                  <PrimaryButton
+                    label="Agregar al calendario"
+                    onPress={() => handleAddToCalendar(selectedRecord)}
+                    loading={addingToCalendar}
+                    icon={<IconCalendar color={colors.onTeal} size={20} />}
+                    style={{ height: 52, borderRadius: radii.button }}
+                  />
+                  {calendarFeedback?.type === 'err' ? (
+                    <View style={{ gap: 4 }}>
+                      <ErrorBox message={calendarFeedback.text} />
+                      {calendarFeedback.needsSettings ? (
+                        <TextButton label="Abrir ajustes" onPress={() => Linking.openSettings()} />
+                      ) : null}
+                    </View>
+                  ) : null}
+                  {calendarFeedback?.type === 'ok' ? (
+                    <View accessibilityRole="alert" style={{ gap: 2 }}>
+                      <Text style={[t.small, { fontFamily: fonts.textSemi, color: colors.teal }]}>
+                        {calendarFeedback.text}
+                      </Text>
+                      {calendarFeedback.detail ? (
+                        <Text numberOfLines={1} style={[t.tiny, { color: colors.inkSoft }]}>
+                          {calendarFeedback.detail}
+                        </Text>
+                      ) : null}
+                    </View>
+                  ) : null}
+                </View>
+              ) : null}
               <View style={{ flexDirection: 'row', gap: 10, paddingTop: 6 }}>
                 <GhostButton
                   label="Editar"
