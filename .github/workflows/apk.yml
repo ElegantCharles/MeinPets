@@ -1,0 +1,80 @@
+name: Compilar APK
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - "FASE 2/Evidencias Proyecto/Evidencias de sistema/aplicacion/movil/**"
+      - ".github/workflows/apk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: FASE 2/Evidencias Proyecto/Evidencias de sistema/aplicacion/movil
+    env:
+      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
+      EXPO_NO_TELEMETRY: "1"
+      CI: "1"
+      NODE_ENV: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar URL de la API
+        run: test -n "$EXPO_PUBLIC_API_URL"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: FASE 2/Evidencias Proyecto/Evidencias de sistema/aplicacion/movil/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - run: npm ci --no-audit --no-fund
+
+      - run: npx tsc --noEmit
+
+      - run: npx expo prebuild --platform android --no-install --clean
+
+      - name: Permitir HTTP y limitar a arm64
+        run: |
+          sed -i 's|<application |<application android:usesCleartextTraffic="true" |' android/app/src/main/AndroidManifest.xml
+          sed -i 's|^reactNativeArchitectures=.*|reactNativeArchitectures=arm64-v8a|' android/gradle.properties
+
+      - name: Compilar
+        working-directory: FASE 2/Evidencias Proyecto/Evidencias de sistema/aplicacion/movil/android
+        run: ./gradlew assembleRelease --console=plain
+
+      - name: Publicar en Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          corto="${GITHUB_SHA::7}"
+          archivo="meinpets-dev-${corto}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$archivo"
+          gh release create "dev-${{ github.run_number }}" "$archivo" \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "dev ${corto}" \
+            --notes "Compilación automática de dev (${corto})."
+
+      - name: Dejar solo los últimos 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release list --limit 100 --json tagName --jq '[.[] | select(.tagName | startswith("dev-"))][5:][].tagName' |
+            xargs -r -n1 gh release delete --cleanup-tag --yes
