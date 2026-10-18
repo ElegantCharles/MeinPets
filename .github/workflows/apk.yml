@@ -23,7 +23,7 @@ jobs:
       run:
         working-directory: FASE 2/Evidencias Proyecto/Evidencias de sistema/aplicacion/movil
     env:
-      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
+      EXPO_PUBLIC_API_URL: ${{ secrets.EXPO_PUBLIC_API_URL }}
       EXPO_NO_TELEMETRY: "1"
       CI: "1"
       NODE_ENV: production
