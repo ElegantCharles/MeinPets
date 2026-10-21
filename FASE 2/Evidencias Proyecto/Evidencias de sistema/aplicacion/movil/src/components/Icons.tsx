@@ -116,3 +116,49 @@ export const IconPill = (p: IconProps) => (
     <Path d="M9.2 15.2l5.6-6.4" />
   </Base>
 );
+
+export const IconGrid = (p: IconProps) => (
+  <Base {...p}>
+    <Path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />
+  </Base>
+);
+
+export const IconClock = (p: IconProps) => (
+  <Base strokeWidth={2.2} {...p}>
+    <Circle cx="12" cy="12" r="8.5" />
+    <Path d="M12 7.5V12l3 2" />
+  </Base>
+);
+
+export const IconBag = (p: IconProps) => (
+  <Base {...p}>
+    <Path d="M5 8h14l-1 12H6L5 8z" />
+    <Path d="M9 8V7a3 3 0 0 1 6 0v1" />
+  </Base>
+);
+
+export const IconNavigation = ({ size = 22, color = colors.ink }: IconProps) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+    <Path d="M3 11l18-8-8 18-2-8-8-2z" />
+  </Svg>
+);
+
+export const IconPhone = (p: IconProps) => (
+  <Base {...p}>
+    <Path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />
+  </Base>
+);
+
+export const IconLocate = (p: IconProps) => (
+  <Base {...p}>
+    <Circle cx="12" cy="12" r="3.2" />
+    <Circle cx="12" cy="12" r="7.2" />
+    <Path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+  </Base>
+);
+
+export const IconCross = (p: IconProps) => (
+  <Base strokeWidth={2.6} {...p}>
+    <Path d="M12 5.5v13M5.5 12h13" />
+  </Base>
+);

@@ -29,6 +29,7 @@ import {
   Avatar,
   BottomSheet,
   CategoryIcon,
+  DetailLine,
   ErrorBox,
   GhostButton,
   IconButton,
@@ -714,15 +715,6 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
           )
         ) : null}
       </BottomSheet>
-    </View>
-  );
-}
-
-function DetailLine({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={{ gap: 2 }}>
-      <Text style={[t.tiny, { color: colors.inkSoft }]}>{label}</Text>
-      <Text style={[t.body, { color: colors.ink }]}>{value}</Text>
     </View>
   );
 }

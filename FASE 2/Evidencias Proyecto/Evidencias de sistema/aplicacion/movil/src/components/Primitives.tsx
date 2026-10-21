@@ -72,11 +72,13 @@ export function IconButton({
   label,
   onPress,
   onTeal,
+  ring,
   children,
 }: {
   label: string;
   onPress: () => void;
   onTeal?: boolean;
+  ring?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -87,6 +89,7 @@ export function IconButton({
       style={({ pressed }) => [
         styles.iconButton,
         onTeal && { backgroundColor: colors.onTealGlass },
+        ring && { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line },
         pressed && { opacity: 0.7 },
       ]}
     >
@@ -102,17 +105,19 @@ export function TopBar({
   onBack,
   right,
   onTeal,
+  ring,
 }: {
   title?: string;
   onBack: () => void;
   right?: React.ReactNode;
   onTeal?: boolean;
+  ring?: boolean;
 }) {
   const insets = useSafeAreaInsets();
   return (
     <View style={{ paddingTop: insets.top }}>
       <View style={styles.topBar}>
-        <IconButton label="Volver" onPress={onBack} onTeal={onTeal}>
+        <IconButton label="Volver" onPress={onBack} onTeal={onTeal} ring={ring}>
           <IconBack color={onTeal ? colors.onTeal : colors.ink} />
         </IconButton>
         {title ? (
@@ -258,11 +263,15 @@ export function Chip({
   selected,
   onPress,
   height = 44,
+  icon,
+  iconColor,
 }: {
   label: string;
   selected: boolean;
   onPress: () => void;
   height?: number;
+  icon?: (color: string) => React.ReactNode;
+  iconColor?: string;
 }) {
   return (
     <Pressable
@@ -281,6 +290,7 @@ export function Chip({
         pressed && { opacity: 0.8 },
       ]}
     >
+      {icon ? icon(selected ? colors.onTeal : iconColor ?? colors.ink) : null}
       <Text style={[t.label, { color: selected ? colors.onTeal : colors.ink }]}>{label}</Text>
     </Pressable>
   );
@@ -348,6 +358,17 @@ export function Tile({ label, value }: { label: string; value: string }) {
       <Text numberOfLines={1} style={{ fontFamily: fonts.displaySemi, fontSize: 14, color: colors.ink }}>
         {value}
       </Text>
+    </View>
+  );
+}
+
+/* -------------------------------------------------------------- DetailLine */
+
+export function DetailLine({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={{ gap: 2 }}>
+      <Text style={[t.tiny, { color: colors.inkSoft }]}>{label}</Text>
+      <Text style={[t.body, { color: colors.ink }]}>{value}</Text>
     </View>
   );
 }
@@ -493,6 +514,8 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 18,
     borderWidth: 1.5,
+    flexDirection: 'row',
+    gap: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
