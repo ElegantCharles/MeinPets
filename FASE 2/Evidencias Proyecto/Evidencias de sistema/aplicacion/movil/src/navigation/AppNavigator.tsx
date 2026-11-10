@@ -1,6 +1,7 @@
 import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { RootStackParamList } from './types';
+import type { RootStackParamList, TabParamList } from './types';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import PetsScreen from '../screens/PetsScreen';
@@ -9,12 +10,31 @@ import PetDetailScreen from '../screens/PetDetailScreen';
 import TreatmentFormScreen from '../screens/TreatmentFormScreen';
 import CalendarScreen from '../screens/CalendarScreen';
 import MapScreen from '../screens/MapScreen';
+import AccountScreen from '../screens/AccountScreen';
+import { BottomNav } from '../components';
 import { colors } from '../theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<TabParamList>();
 
-// Todas las pantallas dibujan su propia barra superior (TopBar) o cabecera,
-// así que la cabecera nativa va oculta en el stack completo.
+function Tabs() {
+  return (
+    <Tab.Navigator
+      initialRouteName="Pets"
+      tabBar={(props) => <BottomNav {...props} />}
+      screenOptions={{
+        headerShown: false,
+        sceneStyle: { backgroundColor: colors.ground },
+      }}
+    >
+      <Tab.Screen name="Pets" component={PetsScreen} />
+      <Tab.Screen name="Calendar" component={CalendarScreen} />
+      <Tab.Screen name="Map" component={MapScreen} />
+      <Tab.Screen name="Account" component={AccountScreen} />
+    </Tab.Navigator>
+  );
+}
+
 export default function AppNavigator() {
   return (
     <Stack.Navigator
@@ -26,12 +46,10 @@ export default function AppNavigator() {
     >
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
-      <Stack.Screen name="Pets" component={PetsScreen} />
+      <Stack.Screen name="Tabs" component={Tabs} />
       <Stack.Screen name="PetForm" component={PetFormScreen} />
       <Stack.Screen name="PetDetail" component={PetDetailScreen} />
       <Stack.Screen name="TreatmentForm" component={TreatmentFormScreen} />
-      <Stack.Screen name="Calendar" component={CalendarScreen} />
-      <Stack.Screen name="Map" component={MapScreen} />
     </Stack.Navigator>
   );
 }

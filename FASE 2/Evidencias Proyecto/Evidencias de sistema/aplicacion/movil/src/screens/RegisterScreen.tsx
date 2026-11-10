@@ -48,7 +48,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
     try {
       await registerRequest(trimmedName, trimmedEmail, password);
       await loginRequest(trimmedEmail, password);
-      navigation.replace('Pets');
+      navigation.replace('Tabs');
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : 'No se pudo crear la cuenta. Intenta de nuevo.'

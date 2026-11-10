@@ -41,7 +41,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         if (stored?.token) {
           await fetchProfileRequest(stored.token);
           if (mounted) {
-            navigation.replace('Pets');
+            navigation.replace('Tabs');
             return;
           }
         }
@@ -77,7 +77,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     setLoading(true);
     try {
       await loginRequest(trimmedEmail, password);
-      navigation.replace('Pets');
+      navigation.replace('Tabs');
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : 'No se pudo conectar con el servidor. Intenta de nuevo.'
@@ -163,7 +163,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
             <LinkRow
               icon={<IconMapPin size={20} color={colors.teal} />}
               label="Explorar mapa veterinario"
-              onPress={() => navigation.navigate('Map')}
+              onPress={() => navigation.navigate('Tabs', { screen: 'Map' })}
             />
           </View>
         </View>

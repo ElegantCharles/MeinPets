@@ -1,9 +1,18 @@
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+export type TabParamList = {
+  Pets: undefined;
+  Calendar: undefined;
+  Map: undefined;
+  Account: undefined;
+};
 
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
-  Pets: undefined;
+  Tabs: NavigatorScreenParams<TabParamList> | undefined;
   PetForm: { petId?: number } | undefined;
   PetDetail: { petId: number };
   TreatmentForm: {
@@ -12,15 +21,19 @@ export type RootStackParamList = {
     especieId: number;
     recordId?: number;
   };
-  Calendar: undefined;
-  Map: undefined;
 };
+
+type TabScreenProps<K extends keyof TabParamList> = CompositeScreenProps<
+  BottomTabScreenProps<TabParamList, K>,
+  NativeStackScreenProps<RootStackParamList>
+>;
 
 export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 export type RegisterScreenProps = NativeStackScreenProps<RootStackParamList, 'Register'>;
-export type PetsScreenProps = NativeStackScreenProps<RootStackParamList, 'Pets'>;
 export type PetFormScreenProps = NativeStackScreenProps<RootStackParamList, 'PetForm'>;
 export type PetDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'PetDetail'>;
 export type TreatmentFormScreenProps = NativeStackScreenProps<RootStackParamList, 'TreatmentForm'>;
-export type CalendarScreenProps = NativeStackScreenProps<RootStackParamList, 'Calendar'>;
-export type MapScreenProps = NativeStackScreenProps<RootStackParamList, 'Map'>;
+export type PetsScreenProps = TabScreenProps<'Pets'>;
+export type CalendarScreenProps = TabScreenProps<'Calendar'>;
+export type MapScreenProps = TabScreenProps<'Map'>;
+export type AccountScreenProps = TabScreenProps<'Account'>;

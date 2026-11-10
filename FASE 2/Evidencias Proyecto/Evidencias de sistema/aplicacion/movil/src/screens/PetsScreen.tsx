@@ -3,20 +3,15 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { PetsScreenProps } from '../navigation/types';
-import { getSession, clearSession, AuthUser } from '../services/auth';
+import { resetTo } from '../navigation/reset';
+import { getSession, AuthUser } from '../services/auth';
 import { Pet, fetchPets, formatPetAge } from '../services/pets';
 import {
   Avatar,
   ErrorBox,
-  IconButton,
-  IconCalendar,
   IconChevronRight,
-  IconMapPin,
-  IconMore,
   IconPaw,
   IconPlus,
-  LinkRow,
-  PopoverMenu,
   PrimaryButton,
   TextButton,
 } from '../components';
@@ -28,7 +23,6 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -36,7 +30,7 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
     try {
       const session = await getSession();
       if (!session?.token) {
-        navigation.replace('Login');
+        resetTo(navigation, 'Login');
         return;
       }
       setUser(session.user);
@@ -58,12 +52,6 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
     });
     return unsubscribe;
   }, [navigation, loadData]);
-
-  const handleLogout = async () => {
-    setMenuOpen(false);
-    await clearSession();
-    navigation.replace('Login');
-  };
 
   const firstName = (user?.nombre_completo ?? '').trim().split(/\s+/)[0] ?? '';
 
@@ -88,9 +76,6 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
                   </Text>
                 ) : null}
               </View>
-              <IconButton label="Más opciones" onPress={() => setMenuOpen(true)} onTeal>
-                <IconMore color={colors.onTeal} />
-              </IconButton>
             </View>
           </View>
 
@@ -160,25 +145,10 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
               </View>
             )}
 
-            <LinkRow
-              icon={<IconCalendar size={20} color={colors.teal} />}
-              label="Calendario de refuerzos"
-              onPress={() => navigation.navigate('Calendar')}
-            />
-            <LinkRow
-              icon={<IconMapPin size={20} color={colors.teal} />}
-              label="Mapa veterinario"
-              onPress={() => navigation.navigate('Map')}
-            />
           </View>
         </View>
       </ScrollView>
 
-      <PopoverMenu
-        visible={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        items={[{ label: 'Cerrar sesión', onPress: handleLogout, danger: true }]}
-      />
     </View>
   );
 }

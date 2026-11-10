@@ -70,14 +70,6 @@ export default function CalendarScreen({ navigation }: CalendarScreenProps) {
   const filteredEvents =
     statusFilter === 'all' ? events : events.filter((e) => e.estado === statusFilter);
 
-  const goBack = () => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('Pets');
-    }
-  };
-
   const summary: { key: Exclude<Filter, 'all'>; label: string; count: number }[] = [
     { key: 'vencido', label: 'Vencidos', count: countVencidos },
     { key: 'proximo', label: 'Próximos', count: countProximos },
@@ -88,7 +80,7 @@ export default function CalendarScreen({ navigation }: CalendarScreenProps) {
     <View style={styles.screen}>
       <StatusBar style="dark" />
       <View style={styles.column}>
-        <TopBar title="Calendario de refuerzos" onBack={goBack} />
+        <TopBar title="Calendario" />
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}

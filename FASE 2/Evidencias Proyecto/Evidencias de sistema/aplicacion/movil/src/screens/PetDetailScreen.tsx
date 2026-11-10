@@ -139,7 +139,7 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate('Pets');
+      navigation.navigate('Tabs', { screen: 'Pets' });
     }
   };
 
@@ -277,7 +277,7 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
     setDeleting(true);
     try {
       await deletePet(petId);
-      navigation.replace('Pets');
+      navigation.replace('Tabs', { screen: 'Pets' });
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : 'No se pudo eliminar la mascota. Intenta de nuevo.'
@@ -305,7 +305,7 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
         <StatusBar style="dark" />
         <View style={styles.errorWrap}>
           <ErrorBox message={errorMessage || 'No encontramos a esta mascota.'} />
-          <PrimaryButton label="Volver a mis mascotas" onPress={() => navigation.replace('Pets')} />
+          <PrimaryButton label="Volver a mis mascotas" onPress={() => navigation.replace('Tabs', { screen: 'Pets' })} />
         </View>
       </View>
     );
@@ -480,7 +480,7 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
 
             {/* Calendario */}
             <Pressable
-              onPress={() => navigation.navigate('Calendar')}
+              onPress={() => navigation.navigate('Tabs', { screen: 'Calendar' })}
               accessibilityRole="button"
               accessibilityLabel="Calendario de refuerzos"
               style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.85 }]}

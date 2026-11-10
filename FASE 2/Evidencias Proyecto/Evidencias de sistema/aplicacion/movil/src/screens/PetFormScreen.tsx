@@ -210,7 +210,7 @@ export default function PetFormScreen({ navigation, route }: PetFormScreenProps)
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate('Pets');
+      navigation.navigate('Tabs', { screen: 'Pets' });
     }
   };
 
