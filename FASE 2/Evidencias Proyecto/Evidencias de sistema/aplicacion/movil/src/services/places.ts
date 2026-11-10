@@ -15,6 +15,14 @@ export interface Place {
   horario: string | null;
   latitud: number;
   longitud: number;
+  distanciaM: number | null;
+}
+
+export interface NearbyQuery {
+  lat: number;
+  lng: number;
+  radio?: number;
+  categoria?: PlaceCategory;
 }
 
 export interface PlaceCategoryInfo {
@@ -40,6 +48,7 @@ interface PlaceRow {
   horario: string | null;
   latitud: number | string;
   longitud: number | string;
+  distancia_m?: number | string | null;
 }
 
 const { LOCATIONS } = API_CONFIG.ENDPOINTS.MAP;
@@ -58,6 +67,7 @@ function mapPlaceRow(row: PlaceRow): Place | null {
   const categoria = normalizePlaceCategory(row.categoria);
   const latitud = Number(row.latitud);
   const longitud = Number(row.longitud);
+  const distancia = row.distancia_m === undefined || row.distancia_m === null ? NaN : Number(row.distancia_m);
   if (!categoria || !Number.isFinite(latitud) || !Number.isFinite(longitud)) {
     return null;
   }
@@ -70,11 +80,20 @@ function mapPlaceRow(row: PlaceRow): Place | null {
     horario: row.horario?.trim() || null,
     latitud,
     longitud,
+    distanciaM: Number.isFinite(distancia) ? distancia : null,
   };
 }
 
-export async function fetchPlaces(): Promise<Place[]> {
-  const { locations } = await request<{ locations: PlaceRow[] }>(LOCATIONS, {
+function nearbyPath(query?: NearbyQuery): string {
+  if (!query) return LOCATIONS;
+  const params = [`lat=${query.lat.toFixed(6)}`, `lng=${query.lng.toFixed(6)}`];
+  if (query.radio !== undefined) params.push(`radio=${Math.round(query.radio)}`);
+  if (query.categoria) params.push(`categoria=${query.categoria}`);
+  return `${LOCATIONS}?${params.join('&')}`;
+}
+
+export async function fetchPlaces(nearby?: NearbyQuery): Promise<Place[]> {
+  const { locations } = await request<{ locations: PlaceRow[] }>(nearbyPath(nearby), {
     auth: false,
     fallbackError: 'No se pudieron cargar los lugares. Intenta de nuevo.',
   });

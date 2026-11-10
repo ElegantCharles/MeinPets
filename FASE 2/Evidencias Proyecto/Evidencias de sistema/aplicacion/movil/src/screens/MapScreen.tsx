@@ -236,6 +236,7 @@ export default function MapScreen({ navigation }: MapScreenProps) {
   const [detailId, setDetailId] = useState<number | null>(null);
 
   const [userLocation, setUserLocation] = useState<MapPoint | null>(null);
+  const [serverDistances, setServerDistances] = useState<Record<number, number>>({});
   const [locating, setLocating] = useState(false);
   const [locationNote, setLocationNote] = useState<{ text: string; needsSettings: boolean } | null>(null);
 
@@ -298,10 +299,19 @@ export default function MapScreen({ navigation }: MapScreenProps) {
     }
   }, [visibleInRegion, loading, errorMessage, focusPoint, focusBounds]);
 
+  const kmFor = useCallback(
+    (place: Place): number | null => {
+      if (!userLocation) return null;
+      const fromServer = serverDistances[place.id];
+      return fromServer !== undefined ? fromServer / 1000 : distanceKm(userLocation, placePoint(place));
+    },
+    [userLocation, serverDistances]
+  );
+
   const carousel = useMemo(() => {
     const withKm = visible.map((place) => ({
       place,
-      km: userLocation ? distanceKm(userLocation, placePoint(place)) : null,
+      km: kmFor(place),
       inRegion: isInRegion(place),
     }));
     return withKm.sort((a, b) => {
@@ -309,7 +319,7 @@ export default function MapScreen({ navigation }: MapScreenProps) {
       if (a.inRegion !== b.inRegion) return a.inRegion ? -1 : 1;
       return a.place.nombre.localeCompare(b.place.nombre);
     });
-  }, [visible, userLocation]);
+  }, [visible, kmFor]);
 
   const markers = useMemo<MapMarker[]>(
     () =>
@@ -343,7 +353,7 @@ export default function MapScreen({ navigation }: MapScreenProps) {
     if (detailPlace) setShownPlace(detailPlace);
   }, [detailPlace]);
 
-  const shownKm = userLocation && shownPlace ? distanceKm(userLocation, placePoint(shownPlace)) : null;
+  const shownKm = shownPlace ? kmFor(shownPlace) : null;
 
   const insetsForMap = useMemo(
     () => ({ top: headerHeight, bottom: carousel.length > 0 && !mapFailed ? sheetHeight : 0 }),
@@ -390,6 +400,15 @@ export default function MapScreen({ navigation }: MapScreenProps) {
     if (result.status === 'ok') {
       const point = { latitude: result.latitude, longitude: result.longitude };
       setUserLocation(point);
+      fetchPlaces({ lat: point.latitude, lng: point.longitude })
+        .then((nearby) => {
+          const next: Record<number, number> = {};
+          for (const place of nearby) {
+            if (place.distanciaM !== null) next[place.id] = place.distanciaM;
+          }
+          setServerDistances(next);
+        })
+        .catch(() => setServerDistances({}));
       const closest = visible
         .map((place) => ({ place, km: distanceKm(point, placePoint(place)) }))
         .sort((a, b) => a.km - b.km)[0];
