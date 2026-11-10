@@ -108,7 +108,7 @@ export function TopBar({
   ring,
 }: {
   title?: string;
-  onBack: () => void;
+  onBack?: () => void;
   right?: React.ReactNode;
   onTeal?: boolean;
   ring?: boolean;
@@ -117,9 +117,11 @@ export function TopBar({
   return (
     <View style={{ paddingTop: insets.top }}>
       <View style={styles.topBar}>
-        <IconButton label="Volver" onPress={onBack} onTeal={onTeal} ring={ring}>
-          <IconBack color={onTeal ? colors.onTeal : colors.ink} />
-        </IconButton>
+        {onBack ? (
+          <IconButton label="Volver" onPress={onBack} onTeal={onTeal} ring={ring}>
+            <IconBack color={onTeal ? colors.onTeal : colors.ink} />
+          </IconButton>
+        ) : null}
         {title ? (
           <Text
             numberOfLines={1}

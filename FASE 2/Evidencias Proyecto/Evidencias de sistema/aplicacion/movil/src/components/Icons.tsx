@@ -87,6 +87,19 @@ export const IconPaw = ({ size = 22, color = colors.ink }: IconProps) => (
   </Svg>
 );
 
+export const IconUser = (p: IconProps) => (
+  <Base strokeWidth={2.2} {...p}>
+    <Circle cx="12" cy="8" r="3.6" />
+    <Path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6" />
+  </Base>
+);
+
+export const IconLogout = (p: IconProps) => (
+  <Base strokeWidth={2.2} {...p}>
+    <Path d="M10 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20H10M15 8l4 4-4 4M19 12H9" />
+  </Base>
+);
+
 export const IconMapPin = (p: IconProps) => (
   <Base strokeWidth={1.9} {...p}>
     <Path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
