@@ -7,19 +7,22 @@ export const colors = {
   ink: '#0F2A2A',
   inkLabel: '#3F5957',
   inkSoft: '#5A7371',
-  placeholder: '#8AA09C',
+  placeholder: '#5F7C78',
   teal: '#0B6B63',
   tealPressed: '#095A53',
+  tealDeep: '#07463F',
   mint: '#D6EBE4',
   mintSelected: '#E3F1EC',
   ball: '#E4F25A',
   ballInk: '#2E3F10',
   line: '#C5D7D1',
   divider: '#E3ECE8',
+  skeleton: '#D5E1DB',
   danger: '#B3261E',
   dangerBg: '#FBE4E1',
   scrim: 'rgba(15,42,42,0.45)',
   scrimSoft: 'rgba(15,42,42,0.28)',
+  scrimStrong: 'rgba(15,42,42,0.58)',
   onTeal: '#FFFFFF',
   onTealSoft: '#CFE8E2',
   onTealGlass: 'rgba(255,255,255,0.14)',
@@ -53,6 +56,10 @@ export const radii = {
   button: 18,
   chip: 20,
   round: 24,
+  control: 16,
+  item: 14,
+  small: 12,
+  navPill: 15,
 } as const;
 
 export const space = { gutter: 20, tight: 8, gap: 12, section: 24 } as const;
@@ -69,6 +76,8 @@ export const type = {
   label: { fontFamily: fonts.textSemi, fontSize: 14, lineHeight: 18 },
   small: { fontFamily: fonts.text, fontSize: 13, lineHeight: 18 },
   tiny: { fontFamily: fonts.text, fontSize: 12, lineHeight: 16 },
+  buttonLabel: { fontFamily: fonts.displaySemi, fontSize: 17, lineHeight: 22 },
+  avatarInitial: { fontFamily: fonts.display, fontSize: 28, lineHeight: 32 },
   placeName: { fontFamily: fonts.display, fontSize: 17, lineHeight: 20 },
   distance: { fontFamily: fonts.display, fontSize: 20, lineHeight: 22 },
 } as const;
@@ -126,6 +135,14 @@ export const sheetShadow = {
   shadowOffset: { width: 0, height: -10 },
   shadowOpacity: 0.14,
   shadowRadius: 32,
+  elevation: 8,
+} as const;
+
+export const menuShadow = {
+  shadowColor: colors.ink,
+  shadowOffset: { width: 0, height: 14 },
+  shadowOpacity: 0.22,
+  shadowRadius: 36,
   elevation: 8,
 } as const;
 

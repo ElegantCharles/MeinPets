@@ -9,7 +9,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, radii, type as t } from '../theme';
+import { colors, menuShadow, radii, type as t } from '../theme';
 import { IconClose } from './Icons';
 
 /**
@@ -180,15 +180,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radii.row,
     padding: 6,
-    shadowColor: colors.ink,
-    shadowOffset: { width: 0, height: 14 },
-    shadowOpacity: 0.22,
-    shadowRadius: 36,
-    elevation: 8,
+    ...menuShadow,
   },
   menuItem: {
     height: 48,
-    borderRadius: 14,
+    borderRadius: radii.item,
     paddingHorizontal: 14,
     justifyContent: 'center',
   },
