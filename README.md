@@ -182,6 +182,10 @@ Cada sprint contempla cuatro etapas:
 El semestre se divide en tres fases: definición del proyecto, desarrollo incremental por módulos
 y cierre con validación y presentación final.
 
+Las tareas realizadas en cada sprint semanal son detalladas y monitoreadas con la herramienta de Github Project, conteniendo tanto el Product Backlog como el Sprint Backlog de las fases del proyecto. El enlace se dejará adjunto debajo de este parrafo para facilitar la lectura y la revisión del proyecto. 
+
+Link Github Project: https://github.com/users/ElegantCharles/projects/2
+
 ## 6. Arquitectura de la solución
 La solución sigue una arquitectura cliente-servidor de tres capas:
 
