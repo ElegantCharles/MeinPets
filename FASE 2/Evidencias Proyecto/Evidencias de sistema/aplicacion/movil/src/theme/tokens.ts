@@ -52,6 +52,7 @@ export const radii = {
   pill: 22,
   button: 18,
   chip: 20,
+  round: 24,
 } as const;
 
 export const space = { gutter: 20, tight: 8, gap: 12, section: 24 } as const;
@@ -68,6 +69,8 @@ export const type = {
   label: { fontFamily: fonts.textSemi, fontSize: 14, lineHeight: 18 },
   small: { fontFamily: fonts.text, fontSize: 13, lineHeight: 18 },
   tiny: { fontFamily: fonts.text, fontSize: 12, lineHeight: 16 },
+  placeName: { fontFamily: fonts.display, fontSize: 17, lineHeight: 20 },
+  distance: { fontFamily: fonts.display, fontSize: 20, lineHeight: 22 },
 } as const;
 
 export type CategoryKey =
@@ -81,6 +84,58 @@ export const categoryStyle: Record<CategoryKey, { bg: string; fg: string }> = {
   desparasitacion_externa: { bg: colors.ball, fg: colors.ink },
   desparasitacion_interna: { bg: colors.mint, fg: colors.ink },
 };
+
+export type PlaceCategoryKey =
+  | 'veterinaria'
+  | 'urgencia_24h'
+  | 'pet_shop'
+  | 'farmacia_veterinaria';
+
+export const placeStyle: Record<PlaceCategoryKey, { bg: string; fg: string; stroke: string }> = {
+  veterinaria: { bg: colors.teal, fg: colors.onTeal, stroke: colors.onTeal },
+  urgencia_24h: { bg: colors.danger, fg: colors.onTeal, stroke: colors.onTeal },
+  pet_shop: { bg: colors.inkLabel, fg: colors.onTeal, stroke: colors.onTeal },
+  farmacia_veterinaria: { bg: colors.tealPressed, fg: colors.onTeal, stroke: colors.onTeal },
+};
+
+export const openNow = '#1E9A62';
+
+export const mapTint = {
+  land: '#E0EBE5',
+  park: '#CBE2D3',
+  water: '#BCD8DA',
+  road: '#FFFFFF',
+  roadCasing: '#D3E1DA',
+  boundary: '#B7CAC3',
+  label: '#4A665E',
+  labelStrong: '#3E5550',
+  labelHalo: '#F7FAF8',
+  accuracy: 'rgba(11,107,99,0.14)',
+} as const;
+
+export const pinHalo = {
+  veterinaria: 'rgba(11,107,99,0.20)',
+  urgencia: 'rgba(179,38,30,0.20)',
+  urgenciaIdle: 'rgba(179,38,30,0.16)',
+  tienda: 'rgba(63,89,87,0.20)',
+  farmacia: 'rgba(9,90,83,0.20)',
+} as const;
+
+export const sheetShadow = {
+  shadowColor: colors.ink,
+  shadowOffset: { width: 0, height: -10 },
+  shadowOpacity: 0.14,
+  shadowRadius: 32,
+  elevation: 8,
+} as const;
+
+export const fabShadow = {
+  shadowColor: colors.ink,
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.3,
+  shadowRadius: 16,
+  elevation: 6,
+} as const;
 
 // Única sombra del sistema: la tarjeta que flota sobre la cabecera.
 export const floatingShadow = {

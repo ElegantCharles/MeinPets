@@ -8,6 +8,7 @@ import speciesRouter from './routes/species';
 import petsRouter from './routes/pets';
 import treatmentsRouter from './routes/treatments';
 import calendarRouter from './routes/calendar';
+import mapRouter from './routes/map';
 
 export function createApp() {
   const app = express();
@@ -24,7 +25,8 @@ export function createApp() {
     speciesRouter,
     petsRouter,
     treatmentsRouter,
-    calendarRouter
+    calendarRouter,
+    mapRouter
   );
 
   app.use(notFound);

@@ -31,6 +31,13 @@
           "calendarPermission": "MeinPets usa tu calendario para guardar los recordatorios de refuerzo de tu mascota.",
           "remindersPermission": false
         }
+      ],
+      "@maplibre/maplibre-react-native",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "MeinPets usa tu ubicación para mostrarte las clínicas y tiendas que tienes cerca."
+        }
       ]
     ]
   }
