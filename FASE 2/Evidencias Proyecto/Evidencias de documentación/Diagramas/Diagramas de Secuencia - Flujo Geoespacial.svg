@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1913.3659999999995 822.45" width="1913.3659999999995" height="822.45" style="--bg:#18181B;--fg:#F4F4F5;--line:#71717A;--muted:#A1A1AA;--surface:#27272A;--border:#3F3F46;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="seq-arrow" markerWidth="8" markerHeight="5" refX="8" refY="2.5" orient="auto-start-reverse">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" />
+  </marker>
+  <marker id="seq-arrow-open" markerWidth="8" markerHeight="5" refX="8" refY="2.5" orient="auto-start-reverse">
+    <polyline points="0 0, 8 2.5, 0 5" fill="none" stroke="var(--_arrow)" stroke-width="1" />
+  </marker>
+</defs>
+<line class="lifeline" data-actor="U" x1="70.687" y1="92.45" x2="70.687" y2="792.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="UI" x1="406.20899999999995" y1="70" x2="406.20899999999995" y2="792.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="Loc" x1="741.4369999999999" y1="70" x2="741.4369999999999" y2="792.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="PS" x1="953.9539999999998" y1="70" x2="953.9539999999998" y2="792.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="API" x1="1395.2079999999996" y1="70" x2="1395.2079999999996" y2="792.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="DB" x1="1724.7899999999995" y1="70" x2="1724.7899999999995" y2="792.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<g class="message" data-from="U" data-to="UI" data-label="Abre pestaña &quot;Mapa&quot; y selecciona filtro (&quot;urgencia_24h&quot;)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="1">
+  <line x1="70.687" y1="112.45" x2="406.20899999999995" y2="112.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="90.44799999999998" y="94.3" width="296" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="238.44799999999998" y="102.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Abre pestaña &quot;Mapa&quot; y selecciona filtro (&quot;urgencia_24h&quot;)</text>
+  <circle class="sequence-number" cx="70.687" cy="112.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="70.687" y="112.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">1</text>
+</g>
+<g class="message" data-from="UI" data-to="Loc" data-label="getUserLocation()" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="2">
+  <line x1="406.20899999999995" y1="152.45" x2="741.4369999999999" y2="152.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="522.8229999999999" y="134.29999999999998" width="102" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="573.8229999999999" y="142.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">getUserLocation()</text>
+  <circle class="sequence-number" cx="406.20899999999995" cy="152.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="406.20899999999995" y="152.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">2</text>
+</g>
+<g class="message" data-from="Loc" data-to="UI" data-label="Coordenadas del dispositivo { lat, lng }" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="3">
+  <line x1="741.4369999999999" y1="192.45" x2="406.20899999999995" y2="192.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="473.82299999999987" y="174.29999999999998" width="200" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="573.8229999999999" y="182.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Coordenadas del dispositivo { lat, lng }</text>
+  <circle class="sequence-number" cx="741.4369999999999" cy="192.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="741.4369999999999" y="192.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">3</text>
+</g>
+<g class="message" data-from="UI" data-to="PS" data-label="fetchPlaces({ lat, lng, radio: 5000, categoria: 'urgencia_24h' })" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="4">
+  <line x1="406.20899999999995" y1="232.45" x2="953.9539999999998" y2="232.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="520.5814999999999" y="214.29999999999998" width="319" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="680.0814999999999" y="222.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">fetchPlaces({ lat, lng, radio: 5000, categoria: &#39;urgencia_24h&#39; })</text>
+  <circle class="sequence-number" cx="406.20899999999995" cy="232.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="406.20899999999995" y="232.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">4</text>
+</g>
+<g class="message" data-from="PS" data-to="API" data-label="GET /api/map/locations?lat=-33.04&amp;lng=-71.62&amp;radio=5000&amp;categoria=urgencia_24h" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="5">
+  <line x1="953.9539999999998" y1="272.45" x2="1395.2079999999996" y2="272.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="953.0809999999997" y="254.29999999999998" width="443" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1174.5809999999997" y="262.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">GET /api/map/locations?lat=-33.04&amp;lng=-71.62&amp;radio=5000&amp;categoria=urgencia_24h</text>
+  <circle class="sequence-number" cx="953.9539999999998" cy="272.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="953.9539999999998" y="272.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">5</text>
+</g>
+<g class="message" data-from="API" data-to="API" data-label="Validar coordenadas y límites numéricos con Zod" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="6">
+  <polyline points="1395.2079999999996,312.45 1425.2079999999996,312.45 1425.2079999999996,332.45 1395.2079999999996,332.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1430.2079999999996" y="314.3" width="266" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1433.2079999999996" y="322.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Validar coordenadas y límites numéricos con Zod</text>
+  <circle class="sequence-number" cx="1395.2079999999996" cy="312.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1395.2079999999996" y="312.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">6</text>
+</g>
+<g class="message" data-from="API" data-to="DB" data-label="Query espacial con índice GiST:
+ST_DWithin(ubicacion::geography, origin, 5000)
+ORDER BY ST_Distance(ubicacion::geography, origin)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="7">
+  <line x1="1395.2079999999996" y1="382.45" x2="1724.7899999999995" y2="382.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1414.9989999999996" y="350" width="290" height="44.900000000000006" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1559.9989999999996" y="372.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)"><tspan x="1559.9989999999996" dy="-10.450000000000001">Query espacial con índice GiST:</tspan><tspan x="1559.9989999999996" dy="14.3">ST_DWithin(ubicacion::geography, origin, 5000)</tspan><tspan x="1559.9989999999996" dy="14.3">ORDER BY ST_Distance(ubicacion::geography, origin)</tspan></text>
+  <circle class="sequence-number" cx="1395.2079999999996" cy="382.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1395.2079999999996" y="382.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">7</text>
+</g>
+<g class="message" data-from="DB" data-to="API" data-label="Retorna filas de establecimientos ordenados con distancia_m" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="8">
+  <line x1="1724.7899999999995" y1="422.45" x2="1395.2079999999996" y2="422.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1399.4989999999996" y="404.3" width="321" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1559.9989999999996" y="412.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Retorna filas de establecimientos ordenados con distancia_m</text>
+  <circle class="sequence-number" cx="1724.7899999999995" cy="422.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1724.7899999999995" y="422.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">8</text>
+</g>
+<g class="message" data-from="API" data-to="PS" data-label="HTTP 200 OK (Array de lugares)" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="9">
+  <line x1="1395.2079999999996" y1="462.45" x2="953.9539999999998" y2="462.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1086.5809999999997" y="444.3" width="176" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1174.5809999999997" y="452.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">HTTP 200 OK (Array de lugares)</text>
+  <circle class="sequence-number" cx="1395.2079999999996" cy="462.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1395.2079999999996" y="462.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">9</text>
+</g>
+<g class="message" data-from="PS" data-to="PS" data-label="Normalizar categorías y calcular walkingMinutes()" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="10">
+  <polyline points="953.9539999999998,502.45 983.9539999999998,502.45 983.9539999999998,522.45 953.9539999999998,522.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="988.9539999999998" y="504.30000000000007" width="270" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="991.9539999999998" y="512.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Normalizar categorías y calcular walkingMinutes()</text>
+  <circle class="sequence-number" cx="953.9539999999998" cy="502.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="953.9539999999998" y="502.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">10</text>
+</g>
+<g class="message" data-from="PS" data-to="UI" data-label="Array de objetos Place" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="11">
+  <line x1="953.9539999999998" y1="572.45" x2="406.20899999999995" y2="572.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="616.5814999999999" y="554.3000000000001" width="127" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="680.0814999999999" y="562.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Array de objetos Place</text>
+  <circle class="sequence-number" cx="953.9539999999998" cy="572.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="953.9539999999998" y="572.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">11</text>
+</g>
+<g class="message" data-from="UI" data-to="UI" data-label="Renderizar pines en MapCanvas (MapLibre)" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="12">
+  <polyline points="406.20899999999995,612.45 436.20899999999995,612.45 436.20899999999995,632.45 406.20899999999995,632.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="441.20899999999995" y="614.3000000000001" width="240" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="444.20899999999995" y="622.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Renderizar pines en MapCanvas (MapLibre)</text>
+  <circle class="sequence-number" cx="406.20899999999995" cy="612.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="406.20899999999995" y="612.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">12</text>
+</g>
+<g class="message" data-from="UI" data-to="UI" data-label="Desplegar BottomSheet con ficha del lugar más cercano" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="13">
+  <polyline points="406.20899999999995,682.45 436.20899999999995,682.45 436.20899999999995,702.45 406.20899999999995,702.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="441.20899999999995" y="684.3000000000001" width="294" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="444.20899999999995" y="692.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Desplegar BottomSheet con ficha del lugar más cercano</text>
+  <circle class="sequence-number" cx="406.20899999999995" cy="682.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="406.20899999999995" y="682.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">13</text>
+</g>
+<g class="message" data-from="UI" data-to="U" data-label="Visualiza mapa interactivo, distancia en km y tiempo caminando" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="14">
+  <line x1="406.20899999999995" y1="752.45" x2="70.687" y2="752.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="74.94799999999998" y="734.3000000000001" width="327" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="238.44799999999998" y="742.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Visualiza mapa interactivo, distancia en km y tiempo caminando</text>
+  <circle class="sequence-number" cx="406.20899999999995" cy="752.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="406.20899999999995" y="752.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">14</text>
+</g>
+<g class="actor" data-id="U" data-label="Usuario" data-type="actor">
+  <g transform="translate(52.687,32) scale(1.5)">
+    <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" fill="none" stroke="var(--_line)" stroke-width="0.6666666666666666" />
+    <path d="M15 10C15 11.6569 13.6569 13 12 13C10.3431 13 9 11.6569 9 10C9 8.34315 10.3431 7 12 7C13.6569 7 15 8.34315 15 10Z" fill="none" stroke="var(--_line)" stroke-width="0.6666666666666666" />
+    <path d="M5.62842 18.3563C7.08963 17.0398 9.39997 16 12 16C14.6 16 16.9104 17.0398 18.3716 18.3563" fill="none" stroke="var(--_line)" stroke-width="0.6666666666666666" />
+  </g>
+  <text x="70.687" y="84" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Usuario</text>
+</g>
+<g class="actor" data-id="UI" data-label="MapScreen" data-type="participant">
+  <rect x="354.03649999999993" y="30" width="104.345" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="406.20899999999995" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">MapScreen</text>
+</g>
+<g class="actor" data-id="Loc" data-label="LocationService (expo-location)" data-type="participant">
+  <rect x="630.3549999999999" y="30" width="222.16399999999996" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="741.4369999999999" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">LocationService (expo-location)</text>
+</g>
+<g class="actor" data-id="PS" data-label="PlacesService" data-type="participant">
+  <rect x="892.5189999999999" y="30" width="122.86999999999999" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="953.9539999999998" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">PlacesService</text>
+</g>
+<g class="actor" data-id="API" data-label="MapRouter (Express)" data-type="participant">
+  <rect x="1314.5069999999996" y="30" width="161.402" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1395.2079999999996" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">MapRouter (Express)</text>
+</g>
+<g class="actor" data-id="DB" data-label="PostgreSQL + PostGIS" data-type="participant">
+  <rect x="1641.1249999999995" y="30" width="167.32999999999996" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1724.7899999999995" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">PostgreSQL + PostGIS</text>
+</g>
+</svg>

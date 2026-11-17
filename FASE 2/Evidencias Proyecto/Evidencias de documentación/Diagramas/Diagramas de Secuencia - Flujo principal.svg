@@ -1,0 +1,291 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2358.555 1480.45" width="2358.555" height="1480.45" style="--bg:#18181B;--fg:#F4F4F5;--line:#71717A;--muted:#A1A1AA;--surface:#27272A;--border:#3F3F46;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="seq-arrow" markerWidth="8" markerHeight="5" refX="8" refY="2.5" orient="auto-start-reverse">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" />
+  </marker>
+  <marker id="seq-arrow-open" markerWidth="8" markerHeight="5" refX="8" refY="2.5" orient="auto-start-reverse">
+    <polyline points="0 0, 8 2.5, 0 5" fill="none" stroke="var(--_arrow)" stroke-width="1" />
+  </marker>
+</defs>
+<line class="lifeline" data-actor="U" x1="91.8055" y1="92.45" x2="91.8055" y2="1450.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="UI" x1="343.57349999999997" y1="70" x2="343.57349999999997" y2="1450.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="TS" x1="656.2294999999999" y1="70" x2="656.2294999999999" y2="1450.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="API" x1="947.7955" y1="70" x2="947.7955" y2="1450.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="Auth" x1="1306.1895" y1="70" x2="1306.1895" y2="1450.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="DB" x1="1739.7214999999999" y1="70" x2="1739.7214999999999" y2="1450.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="CS" x1="1920.0049999999999" y1="70" x2="1920.0049999999999" y2="1450.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="OS" x1="2235.631" y1="70" x2="2235.631" y2="1450.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<g class="block" data-type="alt" data-label="Permiso de calendario no otorgado">
+  <rect x="1841.9009999999998" y="1005.45" width="486.654" height="100" rx="0" ry="0" fill="none" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="1841.9009999999998" y="1005.45" width="251" height="20" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1849.9009999999998" y="1015.45" font-size="11" font-weight="600" fill="var(--_text-sec)" dy="3.8499999999999996">alt [Permiso de calendario no otorgado]</text>
+</g>
+<g class="message" data-from="U" data-to="UI" data-label="Ingresa tratamiento, fecha aplicación y dosis" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="1">
+  <line x1="91.8055" y1="112.45" x2="343.57349999999997" y2="112.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="100.18949999999998" y="94.3" width="235" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="217.68949999999998" y="102.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Ingresa tratamiento, fecha aplicación y dosis</text>
+  <circle class="sequence-number" cx="91.8055" cy="112.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="91.8055" y="112.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">1</text>
+</g>
+<g class="message" data-from="UI" data-to="UI" data-label="computeSuggestedBoosterDate()" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="2">
+  <polyline points="343.57349999999997,152.45 373.57349999999997,152.45 373.57349999999997,172.45 343.57349999999997,172.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="378.57349999999997" y="154.29999999999998" width="180" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="381.57349999999997" y="162.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">computeSuggestedBoosterDate()</text>
+  <circle class="sequence-number" cx="343.57349999999997" cy="152.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="343.57349999999997" y="152.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">2</text>
+</g>
+<g class="message" data-from="U" data-to="UI" data-label="Presiona &quot;Guardar tratamiento&quot;" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="3">
+  <line x1="91.8055" y1="237.45" x2="343.57349999999997" y2="237.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="133.68949999999998" y="219.29999999999998" width="168" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="217.68949999999998" y="227.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Presiona &quot;Guardar tratamiento&quot;</text>
+  <circle class="sequence-number" cx="91.8055" cy="237.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="91.8055" y="237.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">3</text>
+</g>
+<g class="message" data-from="UI" data-to="TS" data-label="createPetTreatment(petId, payload)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="4">
+  <line x1="343.57349999999997" y1="277.45" x2="656.2294999999999" y2="277.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="405.40149999999994" y="259.3" width="189" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="499.90149999999994" y="267.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">createPetTreatment(petId, payload)</text>
+  <circle class="sequence-number" cx="343.57349999999997" cy="277.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="343.57349999999997" y="277.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">4</text>
+</g>
+<g class="message" data-from="TS" data-to="API" data-label="POST /api/pets/:id/treatments (Bearer JWT, payload)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="5">
+  <line x1="656.2294999999999" y1="317.45" x2="947.7955" y2="317.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="663.0124999999999" y="299.3" width="278" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="802.0124999999999" y="307.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">POST /api/pets/:id/treatments (Bearer JWT, payload)</text>
+  <circle class="sequence-number" cx="656.2294999999999" cy="317.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="656.2294999999999" y="317.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">5</text>
+</g>
+<g class="message" data-from="API" data-to="Auth" data-label="requireAuth(req) &amp; requirePetAccess(petId, userId)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="6">
+  <line x1="947.7955" y1="357.45" x2="1306.1895" y2="357.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="990.4924999999998" y="339.3" width="273" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1126.9924999999998" y="347.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">requireAuth(req) &amp; requirePetAccess(petId, userId)</text>
+  <circle class="sequence-number" cx="947.7955" cy="357.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="947.7955" y="357.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">6</text>
+</g>
+<g class="message" data-from="Auth" data-to="DB" data-label="SELECT * FROM usuarios_mascotas WHERE usuario_id = $1 AND mascota_id = $2" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="7">
+  <line x1="1306.1895" y1="397.45" x2="1739.7214999999999" y2="397.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1305.4555" y="379.3" width="435" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1522.9555" y="387.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">SELECT * FROM usuarios_mascotas WHERE usuario_id = $1 AND mascota_id = $2</text>
+  <circle class="sequence-number" cx="1306.1895" cy="397.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1306.1895" y="397.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">7</text>
+</g>
+<g class="message" data-from="DB" data-to="Auth" data-label="Tutor válido (autorizado)" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="8">
+  <line x1="1739.7214999999999" y1="437.45" x2="1306.1895" y2="437.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1455.4555" y="419.3" width="135" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1522.9555" y="427.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Tutor válido (autorizado)</text>
+  <circle class="sequence-number" cx="1739.7214999999999" cy="437.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1739.7214999999999" y="437.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">8</text>
+</g>
+<g class="message" data-from="Auth" data-to="API" data-label="Acceso concedido" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="9">
+  <line x1="1306.1895" y1="477.45" x2="947.7955" y2="477.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1073.9924999999998" y="459.3" width="106" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1126.9924999999998" y="467.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Acceso concedido</text>
+  <circle class="sequence-number" cx="1306.1895" cy="477.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1306.1895" y="477.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">9</text>
+</g>
+<g class="message" data-from="API" data-to="API" data-label="Validar payload con Zod (fechas ISO, refuerzo &gt;= aplicación)" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="10">
+  <polyline points="947.7955,517.45 977.7955,517.45 977.7955,537.45 947.7955,537.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="982.7955" y="519.3000000000001" width="319" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="985.7955" y="527.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Validar payload con Zod (fechas ISO, refuerzo &gt;= aplicación)</text>
+  <circle class="sequence-number" cx="947.7955" cy="517.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="947.7955" y="517.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">10</text>
+</g>
+<g class="message" data-from="API" data-to="DB" data-label="Verificar unicidad (evitar dosis duplicada en misma fecha)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="11">
+  <line x1="947.7955" y1="587.45" x2="1739.7214999999999" y2="587.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1192.7585" y="569.3000000000001" width="302" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1343.7585" y="577.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Verificar unicidad (evitar dosis duplicada en misma fecha)</text>
+  <circle class="sequence-number" cx="947.7955" cy="587.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="947.7955" y="587.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">11</text>
+</g>
+<g class="message" data-from="DB" data-to="API" data-label="Sin duplicados" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="12">
+  <line x1="1739.7214999999999" y1="627.45" x2="947.7955" y2="627.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1301.2585" y="609.3000000000001" width="85" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1343.7585" y="617.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Sin duplicados</text>
+  <circle class="sequence-number" cx="1739.7214999999999" cy="627.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1739.7214999999999" y="627.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">12</text>
+</g>
+<g class="message" data-from="API" data-to="DB" data-label="INSERT INTO historial_tratamientos VALUES (...)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="13">
+  <line x1="947.7955" y1="667.45" x2="1739.7214999999999" y2="667.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1215.2585" y="649.3000000000001" width="257" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1343.7585" y="657.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">INSERT INTO historial_tratamientos VALUES (...)</text>
+  <circle class="sequence-number" cx="947.7955" cy="667.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="947.7955" y="667.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">13</text>
+</g>
+<g class="message" data-from="DB" data-to="API" data-label="Registro creado (id, fechas, estado)" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="14">
+  <line x1="1739.7214999999999" y1="707.45" x2="947.7955" y2="707.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1248.7585" y="689.3000000000001" width="190" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1343.7585" y="697.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Registro creado (id, fechas, estado)</text>
+  <circle class="sequence-number" cx="1739.7214999999999" cy="707.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1739.7214999999999" y="707.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">14</text>
+</g>
+<g class="message" data-from="API" data-to="TS" data-label="HTTP 201 Created (treatment data + estado_refuerzo)" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="15">
+  <line x1="947.7955" y1="747.45" x2="656.2294999999999" y2="747.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="662.5124999999999" y="729.3000000000001" width="279" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="802.0124999999999" y="737.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">HTTP 201 Created (treatment data + estado_refuerzo)</text>
+  <circle class="sequence-number" cx="947.7955" cy="747.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="947.7955" y="747.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">15</text>
+</g>
+<g class="message" data-from="TS" data-to="UI" data-label="Tratamiento registrado exitosamente" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="16">
+  <line x1="656.2294999999999" y1="787.45" x2="343.57349999999997" y2="787.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="401.90149999999994" y="769.3000000000001" width="196" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="499.90149999999994" y="777.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Tratamiento registrado exitosamente</text>
+  <circle class="sequence-number" cx="656.2294999999999" cy="787.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="656.2294999999999" y="787.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">16</text>
+</g>
+<g class="message" data-from="UI" data-to="UI" data-label="Redirige a PetDetailScreen con datos actualizados" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="17">
+  <polyline points="343.57349999999997,827.45 373.57349999999997,827.45 373.57349999999997,847.45 343.57349999999997,847.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="378.57349999999997" y="829.3000000000001" width="269" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="381.57349999999997" y="837.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Redirige a PetDetailScreen con datos actualizados</text>
+  <circle class="sequence-number" cx="343.57349999999997" cy="827.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="343.57349999999997" y="827.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">17</text>
+</g>
+<g class="message" data-from="U" data-to="UI" data-label="Presiona &quot;Agregar al calendario&quot;" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="18">
+  <line x1="91.8055" y1="897.45" x2="343.57349999999997" y2="897.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="128.18949999999998" y="879.3000000000001" width="179" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="217.68949999999998" y="887.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Presiona &quot;Agregar al calendario&quot;</text>
+  <circle class="sequence-number" cx="91.8055" cy="897.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="91.8055" y="897.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">18</text>
+</g>
+<g class="message" data-from="UI" data-to="CS" data-label="addBoosterToCalendar(eventData)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="19">
+  <line x1="343.57349999999997" y1="937.45" x2="1920.0049999999999" y2="937.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1036.2892499999998" y="919.3000000000001" width="191" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1131.7892499999998" y="927.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">addBoosterToCalendar(eventData)</text>
+  <circle class="sequence-number" cx="343.57349999999997" cy="937.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="343.57349999999997" y="937.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">19</text>
+</g>
+<g class="message" data-from="CS" data-to="OS" data-label="Calendar.getCalendarPermissions()" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="20">
+  <line x1="1920.0049999999999" y1="977.45" x2="2235.631" y2="977.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1980.3179999999998" y="959.3000000000001" width="195" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="2077.8179999999998" y="967.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Calendar.getCalendarPermissions()</text>
+  <circle class="sequence-number" cx="1920.0049999999999" cy="977.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1920.0049999999999" y="977.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">20</text>
+</g>
+<g class="message" data-from="CS" data-to="OS" data-label="Calendar.requestCalendarPermissions()" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="21">
+  <line x1="1920.0049999999999" y1="1045.45" x2="2235.631" y2="1045.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1967.8179999999998" y="1027.3" width="220" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="2077.8179999999998" y="1035.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Calendar.requestCalendarPermissions()</text>
+  <circle class="sequence-number" cx="1920.0049999999999" cy="1045.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1920.0049999999999" y="1045.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">21</text>
+</g>
+<g class="message" data-from="OS" data-to="CS" data-label="Permiso concedido (granted = true)" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="22">
+  <line x1="2235.631" y1="1085.45" x2="1920.0049999999999" y2="1085.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1983.3179999999998" y="1067.3" width="189" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="2077.8179999999998" y="1075.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Permiso concedido (granted = true)</text>
+  <circle class="sequence-number" cx="2235.631" cy="1085.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="2235.631" y="1085.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">22</text>
+</g>
+<g class="message" data-from="CS" data-to="OS" data-label="Calendar.getCalendarsAsync()" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="23">
+  <line x1="1920.0049999999999" y1="1125.45" x2="2235.631" y2="1125.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1992.8179999999998" y="1107.3" width="170" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="2077.8179999999998" y="1115.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Calendar.getCalendarsAsync()</text>
+  <circle class="sequence-number" cx="1920.0049999999999" cy="1125.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1920.0049999999999" y="1125.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">23</text>
+</g>
+<g class="message" data-from="OS" data-to="CS" data-label="Calendarios disponibles en el teléfono" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="24">
+  <line x1="2235.631" y1="1165.45" x2="1920.0049999999999" y2="1165.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1976.3179999999998" y="1147.3" width="203" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="2077.8179999999998" y="1155.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Calendarios disponibles en el teléfono</text>
+  <circle class="sequence-number" cx="2235.631" cy="1165.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="2235.631" y="1165.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">24</text>
+</g>
+<g class="message" data-from="CS" data-to="CS" data-label="pickTargetCalendar() / createCalendar(&quot;MeinPets&quot;)" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="25">
+  <polyline points="1920.0049999999999,1205.45 1950.0049999999999,1205.45 1950.0049999999999,1225.45 1920.0049999999999,1225.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1955.0049999999999" y="1207.3" width="272" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1958.0049999999999" y="1215.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">pickTargetCalendar() / createCalendar(&quot;MeinPets&quot;)</text>
+  <circle class="sequence-number" cx="1920.0049999999999" cy="1205.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1920.0049999999999" y="1205.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">25</text>
+</g>
+<g class="message" data-from="CS" data-to="OS" data-label="Calendar.createEventAsync(calendarId, eventDetails)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="26">
+  <line x1="1920.0049999999999" y1="1275.45" x2="2235.631" y2="1275.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1933.3179999999998" y="1257.3" width="289" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="2077.8179999999998" y="1265.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Calendar.createEventAsync(calendarId, eventDetails)</text>
+  <circle class="sequence-number" cx="1920.0049999999999" cy="1275.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1920.0049999999999" y="1275.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">26</text>
+</g>
+<g class="message" data-from="OS" data-to="CS" data-label="ID de evento agendado" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="27">
+  <line x1="2235.631" y1="1330.45" x2="1920.0049999999999" y2="1330.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="2015.3179999999998" y="1312.3" width="125" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="2077.8179999999998" y="1320.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">ID de evento agendado</text>
+  <circle class="sequence-number" cx="2235.631" cy="1330.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="2235.631" y="1330.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">27</text>
+</g>
+<g class="message" data-from="CS" data-to="UI" data-label="{ status: 'created', calendarTitle: 'MeinPets' }" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="28">
+  <line x1="1920.0049999999999" y1="1370.45" x2="343.57349999999997" y2="1370.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1015.2892499999998" y="1352.3" width="233" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1131.7892499999998" y="1360.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">{ status: &#39;created&#39;, calendarTitle: &#39;MeinPets&#39; }</text>
+  <circle class="sequence-number" cx="1920.0049999999999" cy="1370.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1920.0049999999999" y="1370.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">28</text>
+</g>
+<g class="message" data-from="UI" data-to="U" data-label="Notificación: &quot;Listo, quedó en tu calendario&quot;" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="29">
+  <line x1="343.57349999999997" y1="1410.45" x2="91.8055" y2="1410.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="104.18949999999998" y="1392.3" width="227" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="217.68949999999998" y="1400.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Notificación: &quot;Listo, quedó en tu calendario&quot;</text>
+  <circle class="sequence-number" cx="343.57349999999997" cy="1410.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="343.57349999999997" y="1410.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">29</text>
+</g>
+<g class="note" data-position="over" data-actors="UI">
+  <polygon points="163.24050000000003,190.45 517.9064999999999,190.45 523.9064999999999,196.45 523.9064999999999,213.45 163.24050000000003,213.45" fill="var(--bg)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <polygon points="517.9064999999999,190.45 523.9064999999999,196.45 517.9064999999999,196.45" fill="var(--_inner-stroke)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="343.57349999999997" y="201.95" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Sugiere fecha de próximo refuerzo según días de refuerzo del catálogo</text>
+</g>
+<g class="note" data-position="over" data-actors="CS,OS">
+  <polygon points="1946.1929999999998,1283.45 2203.4429999999998,1283.45 2209.4429999999998,1289.45 2209.4429999999998,1306.45 1946.1929999999998,1306.45" fill="var(--bg)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <polygon points="2203.4429999999998,1283.45 2209.4429999999998,1289.45 2203.4429999999998,1289.45" fill="var(--_inner-stroke)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="2077.8179999999998" y="1294.95" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Configura alarma 24 h antes y regla de recurrencia</text>
+</g>
+<g class="actor" data-id="U" data-label="Usuario (Tutor)" data-type="actor">
+  <g transform="translate(73.8055,32) scale(1.5)">
+    <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" fill="none" stroke="var(--_line)" stroke-width="0.6666666666666666" />
+    <path d="M15 10C15 11.6569 13.6569 13 12 13C10.3431 13 9 11.6569 9 10C9 8.34315 10.3431 7 12 7C13.6569 7 15 8.34315 15 10Z" fill="none" stroke="var(--_line)" stroke-width="0.6666666666666666" />
+    <path d="M5.62842 18.3563C7.08963 17.0398 9.39997 16 12 16C14.6 16 16.9104 17.0398 18.3716 18.3563" fill="none" stroke="var(--_line)" stroke-width="0.6666666666666666" />
+  </g>
+  <text x="91.8055" y="84" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Usuario (Tutor)</text>
+</g>
+<g class="actor" data-id="UI" data-label="TreatmentFormScreen / PetDetail" data-type="participant">
+  <rect x="229.157" y="30" width="228.8329999999999" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="343.57349999999997" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">TreatmentFormScreen / PetDetail</text>
+</g>
+<g class="actor" data-id="TS" data-label="TreatmentsService (Móvil)" data-type="participant">
+  <rect x="561.4495" y="30" width="189.55999999999997" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="656.2294999999999" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">TreatmentsService (Móvil)</text>
+</g>
+<g class="actor" data-id="API" data-label="TreatmentsRouter (Express)" data-type="participant">
+  <rect x="846.717" y="30" width="202.15699999999998" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="947.7955" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">TreatmentsRouter (Express)</text>
+</g>
+<g class="actor" data-id="Auth" data-label="Auth &amp; AccessControl" data-type="participant">
+  <rect x="1225.4885" y="30" width="161.402" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1306.1895" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Auth &amp; AccessControl</text>
+</g>
+<g class="actor" data-id="DB" data-label="PostgreSQL (Pool)" data-type="participant">
+  <rect x="1667.542" y="30" width="144.35899999999998" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1739.7214999999999" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">PostgreSQL (Pool)</text>
+</g>
+<g class="actor" data-id="CS" data-label="CalendarService" data-type="participant">
+  <rect x="1851.9009999999998" y="30" width="136.208" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1920.0049999999999" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">CalendarService</text>
+</g>
+<g class="actor" data-id="OS" data-label="Calendario Nativo (OS)" data-type="participant">
+  <rect x="2152.707" y="30" width="165.84799999999998" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="2235.631" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Calendario Nativo (OS)</text>
+</g>
+</svg>
