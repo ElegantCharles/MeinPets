@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
   Linking,
   Pressable,
   ScrollView,
@@ -10,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { PetDetailScreenProps } from '../navigation/types';
 import {
   Pet,
@@ -25,12 +25,16 @@ import {
   getBoosterStatus,
 } from '../services/treatments';
 import { addBoosterToCalendar, calendarSupported } from '../services/calendar';
+import { useOnReconnect } from '../services/network';
 import {
   Avatar,
+  Banner,
   BottomSheet,
   CategoryIcon,
   DetailLine,
   ErrorBox,
+  ErrorState,
+  PetDetailSkeleton,
   GhostButton,
   IconButton,
   IconCalendar,
@@ -79,11 +83,13 @@ function statusLabel(key: StatusKey, days: number | null): string {
 
 export default function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const { petId } = route.params;
+  const insets = useSafeAreaInsets();
 
   const [pet, setPet] = useState<Pet | null>(null);
   const [treatments, setTreatments] = useState<PetTreatmentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<unknown>(null);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDeletePet, setConfirmDeletePet] = useState(false);
@@ -110,14 +116,13 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
   const loadPet = useCallback(async () => {
     setLoading(true);
     setErrorMessage(null);
+    setLoadError(null);
     try {
       const [data, records] = await Promise.all([fetchPetById(petId), fetchPetTreatments(petId)]);
       setPet(data);
       setTreatments(records);
     } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : 'No se pudo cargar la ficha de la mascota.'
-      );
+      setLoadError(error ?? new Error('No se pudo cargar la ficha de la mascota.'));
     } finally {
       setLoading(false);
     }
@@ -130,6 +135,8 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
     });
     return unsubscribe;
   }, [navigation, loadPet]);
+
+  useOnReconnect(loadPet);
 
   useEffect(() => {
     setCalendarFeedback(null);
@@ -289,23 +296,29 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
 
   /* ------------------------------------------------------------- estados */
 
-  if (loading && !pet) {
+  if (loading && !pet && !loadError) {
     return (
-      <View style={styles.center}>
-        <StatusBar style="dark" />
-        <ActivityIndicator size="large" color={colors.teal} />
-        <Text style={[t.body, { color: colors.inkSoft, marginTop: 12 }]}>Cargando ficha…</Text>
+      <View style={styles.screen}>
+        <StatusBar style="light" />
+        <PetDetailSkeleton top={insets.top} onBack={goBack} />
       </View>
     );
   }
 
   if (!pet) {
     return (
-      <View style={styles.center}>
+      <View style={styles.screen}>
         <StatusBar style="dark" />
+        <TopBar onBack={goBack} />
         <View style={styles.errorWrap}>
-          <ErrorBox message={errorMessage || 'No encontramos a esta mascota.'} />
-          <PrimaryButton label="Volver a mis mascotas" onPress={() => navigation.replace('Tabs', { screen: 'Pets' })} />
+          <ErrorState
+            error={loadError ?? new Error('No encontramos a esta mascota.')}
+            title="No pudimos cargar la ficha"
+            onRetry={loadPet}
+            secondaryLabel="Volver a mis mascotas"
+            onSecondary={() => navigation.replace('Tabs', { screen: 'Pets' })}
+            style={{ paddingTop: 24 }}
+          />
         </View>
       </View>
     );
@@ -358,6 +371,9 @@ export default function PetDetailScreen({ navigation, route }: PetDetailScreenPr
 
           <View style={styles.body}>
             {errorMessage ? <ErrorBox message={errorMessage} /> : null}
+            {loadError ? (
+              <Banner message="No pudimos actualizar la ficha." actionLabel="Reintentar" onAction={loadPet} />
+            ) : null}
 
             {/* Protagonista */}
             {hasDoses && next ? (
@@ -733,8 +749,9 @@ const styles = StyleSheet.create({
   },
   errorWrap: {
     width: '100%',
-    maxWidth: 420,
-    gap: 16,
+    maxWidth: 480,
+    alignSelf: 'center',
+    paddingHorizontal: 20,
   },
   scrollContent: {
     flexGrow: 1,

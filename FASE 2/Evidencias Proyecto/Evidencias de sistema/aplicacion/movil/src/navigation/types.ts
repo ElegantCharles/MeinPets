@@ -12,6 +12,7 @@ export type TabParamList = {
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
+  SessionExpired: undefined;
   Tabs: NavigatorScreenParams<TabParamList> | undefined;
   PetForm: { petId?: number } | undefined;
   PetDetail: { petId: number };
@@ -30,6 +31,7 @@ type TabScreenProps<K extends keyof TabParamList> = CompositeScreenProps<
 
 export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 export type RegisterScreenProps = NativeStackScreenProps<RootStackParamList, 'Register'>;
+export type SessionExpiredScreenProps = NativeStackScreenProps<RootStackParamList, 'SessionExpired'>;
 export type PetFormScreenProps = NativeStackScreenProps<RootStackParamList, 'PetForm'>;
 export type PetDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'PetDetail'>;
 export type TreatmentFormScreenProps = NativeStackScreenProps<RootStackParamList, 'TreatmentForm'>;

@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1806.7299999999998 1034.45" width="1806.7299999999998" height="1034.45" style="--bg:#18181B;--fg:#F4F4F5;--line:#71717A;--muted:#A1A1AA;--surface:#27272A;--border:#3F3F46;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="seq-arrow" markerWidth="8" markerHeight="5" refX="8" refY="2.5" orient="auto-start-reverse">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" />
+  </marker>
+  <marker id="seq-arrow-open" markerWidth="8" markerHeight="5" refX="8" refY="2.5" orient="auto-start-reverse">
+    <polyline points="0 0, 8 2.5, 0 5" fill="none" stroke="var(--_arrow)" stroke-width="1" />
+  </marker>
+</defs>
+<line class="lifeline" data-actor="U" x1="80.687" y1="92.45" x2="80.687" y2="1004.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="UI" x1="380.56899999999996" y1="70" x2="380.56899999999996" y2="1004.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="AS" x1="702.135" y1="70" x2="702.135" y2="1004.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="SS" x1="879.059" y1="70" x2="879.059" y2="1004.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="API" x1="1205.377" y1="70" x2="1205.377" y2="1004.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="RL" x1="1522.7849999999999" y1="70" x2="1522.7849999999999" y2="1004.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line class="lifeline" data-actor="DB" x1="1704.5504999999998" y1="70" x2="1704.5504999999998" y2="1004.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<g class="block" data-type="alt" data-label="Contraseña válida">
+  <rect x="30" y="450.45" width="1466.7849999999999" height="534" rx="0" ry="0" fill="none" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="30" y="450.45" width="154" height="20" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="38" y="460.45" font-size="11" font-weight="600" fill="var(--_text-sec)" dy="3.8499999999999996">alt [Contraseña válida]</text>
+  <line x1="30" y1="856.45" x2="1496.7849999999999" y2="856.45" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+  <rect x="35" y="862.3000000000001" width="187" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="38" y="870.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">[Contraseña o correo incorrectos]</text>
+</g>
+<g class="message" data-from="U" data-to="UI" data-label="Ingresa correo y contraseña, presiona &quot;Iniciar sesión&quot;" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="1">
+  <line x1="80.687" y1="112.45" x2="380.56899999999996" y2="112.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="86.62799999999999" y="94.3" width="288" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="230.628" y="102.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Ingresa correo y contraseña, presiona &quot;Iniciar sesión&quot;</text>
+  <circle class="sequence-number" cx="80.687" cy="112.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="80.687" y="112.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">1</text>
+</g>
+<g class="message" data-from="UI" data-to="AS" data-label="loginRequest(email, password)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="2">
+  <line x1="380.56899999999996" y1="152.45" x2="702.135" y2="152.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="458.352" y="134.29999999999998" width="166" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="541.352" y="142.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">loginRequest(email, password)</text>
+  <circle class="sequence-number" cx="380.56899999999996" cy="152.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="380.56899999999996" y="152.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">2</text>
+</g>
+<g class="message" data-from="AS" data-to="API" data-label="POST /api/auth/login { email, password }" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="3">
+  <line x1="702.135" y1="192.45" x2="1205.377" y2="192.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="848.756" y="174.29999999999998" width="210" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="953.756" y="182.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">POST /api/auth/login { email, password }</text>
+  <circle class="sequence-number" cx="702.135" cy="192.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="702.135" y="192.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">3</text>
+</g>
+<g class="message" data-from="API" data-to="RL" data-label="Validar tasa de peticiones (máx 30 intentos / 15 min)" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="4">
+  <line x1="1205.377" y1="232.45" x2="1522.7849999999999" y2="232.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1232.581" y="214.29999999999998" width="263" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1364.081" y="222.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Validar tasa de peticiones (máx 30 intentos / 15 min)</text>
+  <circle class="sequence-number" cx="1205.377" cy="232.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1205.377" y="232.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">4</text>
+</g>
+<g class="message" data-from="RL" data-to="API" data-label="Petición permitida" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="5">
+  <line x1="1522.7849999999999" y1="272.45" x2="1205.377" y2="272.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1314.581" y="254.29999999999998" width="99" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1364.081" y="262.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Petición permitida</text>
+  <circle class="sequence-number" cx="1522.7849999999999" cy="272.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1522.7849999999999" y="272.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">5</text>
+</g>
+<g class="message" data-from="API" data-to="DB" data-label="SELECT id, email, password_hash, nombre_completo FROM usuarios WHERE email = $1" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="6">
+  <line x1="1205.377" y1="312.45" x2="1704.5504999999998" y2="312.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1225.96375" y="294.3" width="458" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1454.96375" y="302.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">SELECT id, email, password_hash, nombre_completo FROM usuarios WHERE email = $1</text>
+  <circle class="sequence-number" cx="1205.377" cy="312.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1205.377" y="312.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">6</text>
+</g>
+<g class="message" data-from="DB" data-to="API" data-label="Datos del usuario encontrado" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="7">
+  <line x1="1704.5504999999998" y1="352.45" x2="1205.377" y2="352.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="1374.46375" y="334.3" width="161" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1454.96375" y="342.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Datos del usuario encontrado</text>
+  <circle class="sequence-number" cx="1704.5504999999998" cy="352.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1704.5504999999998" y="352.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">7</text>
+</g>
+<g class="message" data-from="API" data-to="API" data-label="bcrypt.compare(password, password_hash)" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="8">
+  <polyline points="1205.377,392.45 1235.377,392.45 1235.377,412.45 1205.377,412.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1240.377" y="394.3" width="239" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1243.377" y="402.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">bcrypt.compare(password, password_hash)</text>
+  <circle class="sequence-number" cx="1205.377" cy="392.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1205.377" y="392.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">8</text>
+</g>
+<g class="message" data-from="API" data-to="API" data-label="jwt.sign({ id, email }, JWT_SECRET, { expiresIn: '7d' })" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="9">
+  <polyline points="1205.377,490.45 1235.377,490.45 1235.377,510.45 1205.377,510.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="1240.377" y="492.3" width="274" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="1243.377" y="500.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">jwt.sign({ id, email }, JWT_SECRET, { expiresIn: &#39;7d&#39; })</text>
+  <circle class="sequence-number" cx="1205.377" cy="490.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1205.377" y="490.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">9</text>
+</g>
+<g class="message" data-from="API" data-to="AS" data-label="HTTP 200 OK { token, user }" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="10">
+  <line x1="1205.377" y1="560.45" x2="702.135" y2="560.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="879.256" y="542.3000000000001" width="149" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="953.756" y="550.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">HTTP 200 OK { token, user }</text>
+  <circle class="sequence-number" cx="1205.377" cy="560.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1205.377" y="560.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">10</text>
+</g>
+<g class="message" data-from="AS" data-to="SS" data-label="saveSession({ token, user })" data-line-style="solid" data-arrow-head="filled" data-self="false" data-step="11">
+  <line x1="702.135" y1="600.45" x2="879.059" y2="600.45" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="714.097" y="582.3000000000001" width="153" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="790.597" y="590.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">saveSession({ token, user })</text>
+  <circle class="sequence-number" cx="702.135" cy="600.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="702.135" y="600.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">11</text>
+</g>
+<g class="message" data-from="SS" data-to="SS" data-label="Almacenar en memoria y WebStorage/SecureStorage" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="12">
+  <polyline points="879.059,640.45 909.059,640.45 909.059,660.45 879.059,660.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="914.059" y="642.3000000000001" width="284" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="917.059" y="650.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Almacenar en memoria y WebStorage/SecureStorage</text>
+  <circle class="sequence-number" cx="879.059" cy="640.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="879.059" y="640.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">12</text>
+</g>
+<g class="message" data-from="SS" data-to="AS" data-label="Sesión persistida" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="13">
+  <line x1="879.059" y1="710.45" x2="702.135" y2="710.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="741.097" y="692.3000000000001" width="99" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="790.597" y="700.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Sesión persistida</text>
+  <circle class="sequence-number" cx="879.059" cy="710.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="879.059" y="710.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">13</text>
+</g>
+<g class="message" data-from="AS" data-to="UI" data-label="Autenticación exitosa" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="14">
+  <line x1="702.135" y1="750.45" x2="380.56899999999996" y2="750.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="481.852" y="732.3000000000001" width="119" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="541.352" y="740.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Autenticación exitosa</text>
+  <circle class="sequence-number" cx="702.135" cy="750.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="702.135" y="750.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">14</text>
+</g>
+<g class="message" data-from="UI" data-to="UI" data-label="Navega a pantalla principal (MainTabs / PetsScreen)" data-line-style="solid" data-arrow-head="filled" data-self="true" data-step="15">
+  <polyline points="380.56899999999996,790.45 410.56899999999996,790.45 410.56899999999996,810.45 380.56899999999996,810.45" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#seq-arrow)" />
+  <rect x="415.56899999999996" y="792.3000000000001" width="279" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="418.56899999999996" y="800.45" font-size="11" text-anchor="start" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Navega a pantalla principal (MainTabs / PetsScreen)</text>
+  <circle class="sequence-number" cx="380.56899999999996" cy="790.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="380.56899999999996" y="790.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">15</text>
+</g>
+<g class="message" data-from="API" data-to="AS" data-label="HTTP 401 Unauthorized { error: 'Credenciales inválidas' }" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="16">
+  <line x1="1205.377" y1="884.45" x2="702.135" y2="884.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="803.756" y="866.3000000000001" width="300" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="953.756" y="874.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">HTTP 401 Unauthorized { error: &#39;Credenciales inválidas&#39; }</text>
+  <circle class="sequence-number" cx="1205.377" cy="884.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="1205.377" y="884.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">16</text>
+</g>
+<g class="message" data-from="AS" data-to="UI" data-label="Excepción de autenticación" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="17">
+  <line x1="702.135" y1="924.45" x2="380.56899999999996" y2="924.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="465.852" y="906.3000000000001" width="151" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="541.352" y="914.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Excepción de autenticación</text>
+  <circle class="sequence-number" cx="702.135" cy="924.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="702.135" y="924.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">17</text>
+</g>
+<g class="message" data-from="UI" data-to="U" data-label="Despliega alerta: &quot;Credenciales inválidas&quot;" data-line-style="dashed" data-arrow-head="filled" data-self="false" data-step="18">
+  <line x1="380.56899999999996" y1="964.45" x2="80.687" y2="964.45" stroke="var(--_line)" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+  <rect x="119.12799999999999" y="946.3000000000001" width="223" height="16.3" rx="2" ry="2" fill="var(--bg)" />
+  <text x="230.628" y="954.45" font-size="11" text-anchor="middle" font-weight="400" fill="var(--_text-muted)" dy="3.8499999999999996">Despliega alerta: &quot;Credenciales inválidas&quot;</text>
+  <circle class="sequence-number" cx="380.56899999999996" cy="964.45" r="9" fill="var(--_arrow)" stroke="var(--bg)" stroke-width="1" />
+  <text x="380.56899999999996" y="964.45" class="sequence-number-label" font-size="10" text-anchor="middle" font-weight="600" fill="var(--bg)" dy="3.5">18</text>
+</g>
+<g class="actor" data-id="U" data-label="Usuario" data-type="actor">
+  <g transform="translate(62.687,32) scale(1.5)">
+    <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" fill="none" stroke="var(--_line)" stroke-width="0.6666666666666666" />
+    <path d="M15 10C15 11.6569 13.6569 13 12 13C10.3431 13 9 11.6569 9 10C9 8.34315 10.3431 7 12 7C13.6569 7 15 8.34315 15 10Z" fill="none" stroke="var(--_line)" stroke-width="0.6666666666666666" />
+    <path d="M5.62842 18.3563C7.08963 17.0398 9.39997 16 12 16C14.6 16 16.9104 17.0398 18.3716 18.3563" fill="none" stroke="var(--_line)" stroke-width="0.6666666666666666" />
+  </g>
+  <text x="80.687" y="84" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">Usuario</text>
+</g>
+<g class="actor" data-id="UI" data-label="LoginScreen" data-type="participant">
+  <rect x="324.32099999999997" y="30" width="112.49599999999998" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="380.56899999999996" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">LoginScreen</text>
+</g>
+<g class="actor" data-id="AS" data-label="AuthService" data-type="participant">
+  <rect x="648.11" y="30" width="108.05" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="702.135" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">AuthService</text>
+</g>
+<g class="actor" data-id="SS" data-label="SessionManager" data-type="participant">
+  <rect x="810.5844999999999" y="30" width="136.949" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="879.059" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">SessionManager</text>
+</g>
+<g class="actor" data-id="API" data-label="AuthRouter (Express)" data-type="participant">
+  <rect x="1124.3055" y="30" width="162.14299999999997" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1205.377" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">AuthRouter (Express)</text>
+</g>
+<g class="actor" data-id="RL" data-label="ExpressRateLimit" data-type="participant">
+  <rect x="1453.1989999999998" y="30" width="139.172" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1522.7849999999999" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">ExpressRateLimit</text>
+</g>
+<g class="actor" data-id="DB" data-label="PostgreSQL (Pool)" data-type="participant">
+  <rect x="1632.3709999999999" y="30" width="144.35899999999998" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="1704.5504999999998" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="var(--_text)" dy="4.55">PostgreSQL (Pool)</text>
+</g>
+</svg>
