@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { peekSession } from '../services/session';
 import { colors, fonts, radii, type as t } from '../theme';
 import { IconCalendar, IconMapPin, IconPaw, IconUser } from './Icons';
 
@@ -14,6 +15,11 @@ const TABS: Record<string, { label: string; icon: typeof IconPaw }> = {
 
 export function BottomNav({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const [hasSession] = useState(() => peekSession() !== null);
+
+  if (!hasSession) {
+    return null;
+  }
 
   return (
     <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 12) + 8 }]}>
