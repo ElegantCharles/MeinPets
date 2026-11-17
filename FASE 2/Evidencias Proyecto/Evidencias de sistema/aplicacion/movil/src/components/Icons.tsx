@@ -175,3 +175,41 @@ export const IconCross = (p: IconProps) => (
     <Path d="M12 5.5v13M5.5 12h13" />
   </Base>
 );
+
+export const IconWifiOff = (p: IconProps) => (
+  <Base {...p}>
+    <Path d="M3 3l18 18M5 12.5a10 10 0 0 1 3.4-2.2M19 12.5a10 10 0 0 0-5.2-2.9M8.5 16a5 5 0 0 1 4.6-1.4M12 19.4v.1" />
+  </Base>
+);
+
+export const IconRefresh = (p: IconProps) => (
+  <Base strokeWidth={2.2} {...p}>
+    <Path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5" />
+  </Base>
+);
+
+export const IconSearch = (p: IconProps) => (
+  <Base strokeWidth={2.2} {...p}>
+    <Circle cx="11" cy="11" r="6.5" />
+    <Path d="M16 16l4.5 4.5" />
+  </Base>
+);
+
+export const IconFilter = (p: IconProps) => (
+  <Base strokeWidth={2.2} {...p}>
+    <Path d="M4 5h16l-6 7.5V19l-4 2v-8.5L4 5z" />
+  </Base>
+);
+
+export const IconAlert = (p: IconProps) => (
+  <Base {...p}>
+    <Circle cx="12" cy="12" r="9" />
+    <Path d="M12 7.5v5.5M12 16.4v.1" />
+  </Base>
+);
+
+export const IconList = (p: IconProps) => (
+  <Base strokeWidth={2.2} {...p}>
+    <Path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" />
+  </Base>
+);
