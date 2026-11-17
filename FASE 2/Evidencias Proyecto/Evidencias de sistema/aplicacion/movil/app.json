@@ -38,7 +38,8 @@
         {
           "locationWhenInUsePermission": "MeinPets usa tu ubicación para mostrarte las clínicas y tiendas que tienes cerca."
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
   }
 }
