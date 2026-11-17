@@ -1,12 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import type { CalendarScreenProps } from '../navigation/types';
 import { CalendarEventItem, fetchCalendar } from '../services/treatments';
+import { useOnReconnect } from '../services/network';
 import {
+  Banner,
   CategoryIcon,
-  ErrorBox,
+  ErrorState,
   IconCalendar,
+  Skeleton,
+  SkeletonGroup,
+  SkeletonList,
+  StateView,
   StatusPill,
   TextButton,
   TopBar,
@@ -38,18 +44,16 @@ export default function CalendarScreen({ navigation }: CalendarScreenProps) {
   const [events, setEvents] = useState<CalendarEventItem[]>([]);
   const [statusFilter, setStatusFilter] = useState<Filter>('all');
   const [loading, setLoading] = useState<boolean>(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<unknown>(null);
 
   const loadCalendar = useCallback(async () => {
     setLoading(true);
-    setErrorMessage(null);
+    setLoadError(null);
     try {
       const list = await fetchCalendar();
       setEvents(list);
     } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : 'No se pudo cargar el calendario. Intenta de nuevo.'
-      );
+      setLoadError(error ?? new Error('No se pudo cargar el calendario.'));
     } finally {
       setLoading(false);
     }
@@ -62,6 +66,12 @@ export default function CalendarScreen({ navigation }: CalendarScreenProps) {
     });
     return unsubscribe;
   }, [navigation, loadCalendar]);
+
+  useOnReconnect(loadCalendar);
+
+  const showSkeleton = loading && events.length === 0 && !loadError;
+  const showError = Boolean(loadError) && events.length === 0;
+  const showEmpty = !loading && !loadError && events.length === 0;
 
   const countVencidos = events.filter((e) => e.estado === 'vencido').length;
   const countProximos = events.filter((e) => e.estado === 'proximo').length;
@@ -86,9 +96,35 @@ export default function CalendarScreen({ navigation }: CalendarScreenProps) {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {errorMessage ? <ErrorBox message={errorMessage} /> : null}
+          {loadError && events.length > 0 ? (
+            <Banner message="No pudimos actualizar el calendario." actionLabel="Reintentar" onAction={loadCalendar} />
+          ) : null}
 
-          {/* Resumen que también filtra */}
+          {showSkeleton ? (
+            <>
+              <SkeletonGroup label="Cargando el calendario" style={styles.summaryRow}>
+                {[0, 1, 2].map((index) => (
+                  <Skeleton key={index} height={76} radius={radii.tile} style={{ flex: 1 }} />
+                ))}
+              </SkeletonGroup>
+              <SkeletonList rows={4} label="Cargando refuerzos" boxed />
+            </>
+          ) : showError ? (
+            <ErrorState
+              error={loadError}
+              title="No pudimos cargar el calendario"
+              onRetry={loadCalendar}
+              style={styles.stateTop}
+            />
+          ) : showEmpty ? (
+            <StateView
+              pose="calendario"
+              title="Aún no hay refuerzos"
+              message="Cuando registres una dosis, su próximo refuerzo aparecerá aquí."
+              style={styles.stateTop}
+            />
+          ) : (
+            <>
           <View style={styles.summaryRow}>
             {summary.map((s) => {
               const c = statusColors[s.key];
@@ -123,23 +159,16 @@ export default function CalendarScreen({ navigation }: CalendarScreenProps) {
             />
           ) : null}
 
-          {loading && events.length === 0 ? (
-            <View style={styles.emptyBox}>
-              <ActivityIndicator size="large" color={colors.teal} />
-              <Text style={[t.body, { color: colors.inkSoft, marginTop: 12 }]}>Cargando calendario…</Text>
-            </View>
-          ) : filteredEvents.length === 0 ? (
+          {filteredEvents.length === 0 ? (
             <View style={styles.emptyBox}>
               <View style={styles.emptyIcon}>
                 <IconCalendar size={26} color={colors.teal} />
               </View>
               <Text style={[t.cardTitle, { color: colors.ink, textAlign: 'center' }]}>
-                {events.length === 0 ? 'Sin refuerzos programados' : 'Nada con este estado'}
+                Nada con este estado
               </Text>
               <Text style={[t.small, { color: colors.inkSoft, textAlign: 'center' }]}>
-                {events.length === 0
-                  ? 'Cuando registres una dosis en la ficha de una mascota, su próximo refuerzo aparecerá aquí.'
-                  : 'Quita el filtro para ver el resto de tus recordatorios.'}
+                Quita el filtro para ver el resto de tus recordatorios.
               </Text>
             </View>
           ) : (
@@ -174,6 +203,8 @@ export default function CalendarScreen({ navigation }: CalendarScreenProps) {
               })}
             </View>
           )}
+            </>
+          )}
         </ScrollView>
       </View>
     </View>
@@ -200,6 +231,9 @@ const styles = StyleSheet.create({
   summaryRow: {
     flexDirection: 'row',
     gap: 8,
+  },
+  stateTop: {
+    paddingTop: 24,
   },
   summaryTile: {
     flex: 1,

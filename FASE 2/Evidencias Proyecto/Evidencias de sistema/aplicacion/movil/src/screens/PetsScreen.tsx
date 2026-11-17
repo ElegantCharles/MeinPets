@@ -1,17 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { PetsScreenProps } from '../navigation/types';
 import { resetTo } from '../navigation/reset';
 import { getSession, AuthUser } from '../services/auth';
+import { useOnReconnect } from '../services/network';
 import { Pet, fetchPets, formatPetAge } from '../services/pets';
 import {
   Avatar,
-  ErrorBox,
+  Banner,
+  ErrorState,
   IconChevronRight,
-  IconPaw,
   IconPlus,
+  SkeletonList,
+  StateView,
   PrimaryButton,
   TextButton,
 } from '../components';
@@ -22,11 +25,11 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<unknown>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    setErrorMessage(null);
+    setLoadError(null);
     try {
       const session = await getSession();
       if (!session?.token) {
@@ -37,9 +40,7 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
       const list = await fetchPets();
       setPets(list);
     } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : 'No se pudieron cargar tus mascotas. Intenta de nuevo.'
-      );
+      setLoadError(error ?? new Error('No se pudieron cargar tus mascotas.'));
     } finally {
       setLoading(false);
     }
@@ -53,7 +54,12 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
     return unsubscribe;
   }, [navigation, loadData]);
 
+  useOnReconnect(loadData);
+
   const firstName = (user?.nombre_completo ?? '').trim().split(/\s+/)[0] ?? '';
+  const showSkeleton = loading && pets.length === 0 && !loadError;
+  const showError = Boolean(loadError) && pets.length === 0;
+  const showEmpty = !loading && !loadError && pets.length === 0;
 
   return (
     <View style={styles.screen}>
@@ -63,7 +69,6 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.column}>
-          {/* Cabecera */}
           <View style={[styles.hero, { paddingTop: insets.top + 16 }]}>
             <View style={styles.heroRow}>
               <View style={{ flex: 1, gap: 4 }}>
@@ -79,34 +84,26 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
             </View>
           </View>
 
-          <View style={styles.body}>
-            {errorMessage ? <ErrorBox message={errorMessage} /> : null}
+          <View style={[styles.body, (showError || showEmpty) && styles.bodyState]}>
+            {loadError && pets.length > 0 ? (
+              <Banner message="No pudimos actualizar tus mascotas." actionLabel="Reintentar" onAction={loadData} />
+            ) : null}
 
-            {loading && pets.length === 0 ? (
-              <View style={[styles.floatCard, { alignItems: 'center', paddingVertical: 32 }]}>
-                <ActivityIndicator size="large" color={colors.teal} />
-                <Text style={[t.body, { color: colors.inkSoft, marginTop: 12 }]}>Cargando tus mascotas…</Text>
-              </View>
-            ) : pets.length === 0 ? (
+            {showSkeleton ? (
               <View style={styles.floatCard}>
-                <View style={styles.emptyRow}>
-                  <View style={styles.emptyIcon}>
-                    <IconPaw size={26} color={colors.teal} />
-                  </View>
-                  <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={[t.cardTitle, { color: colors.ink }]}>Aún no tienes mascotas</Text>
-                    <Text style={[t.small, { color: colors.inkSoft }]}>
-                      Crea la ficha de tu perro o gato y lleva su carnet de vacunas al día.
-                    </Text>
-                  </View>
-                </View>
-                <PrimaryButton
-                  label="Registrar mascota"
-                  onPress={() => navigation.navigate('PetForm')}
-                  icon={<IconPlus color={colors.onTeal} size={20} />}
-                  style={{ height: 52, borderRadius: 16 }}
-                />
+                <SkeletonList rows={3} label="Cargando tus mascotas" />
               </View>
+            ) : showError ? (
+              <ErrorState error={loadError} title="No pudimos cargar tus mascotas" onRetry={loadData} />
+            ) : showEmpty ? (
+              <StateView
+                pose="vacio"
+                title="Aquí vivirán tus mascotas"
+                message="Agrega la primera para guardar su carnet de salud y recibir avisos de sus refuerzos."
+                actionLabel="Registrar mascota"
+                onAction={() => navigation.navigate('PetForm')}
+                actionIcon={<IconPlus color={colors.onTeal} size={20} />}
+              />
             ) : (
               <View style={styles.floatCard}>
                 <View style={styles.listHeader}>
@@ -144,11 +141,9 @@ export default function PetsScreen({ navigation }: PetsScreenProps) {
                 ))}
               </View>
             )}
-
           </View>
         </View>
       </ScrollView>
-
     </View>
   );
 }
@@ -185,25 +180,16 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     gap: 12,
   },
+  bodyState: {
+    marginTop: 0,
+    paddingTop: 32,
+  },
   floatCard: {
     backgroundColor: colors.surface,
     borderRadius: radii.card,
     padding: 20,
     gap: 16,
     ...floatingShadow,
-  },
-  emptyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  emptyIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: colors.mint,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   listHeader: {
     flexDirection: 'row',
