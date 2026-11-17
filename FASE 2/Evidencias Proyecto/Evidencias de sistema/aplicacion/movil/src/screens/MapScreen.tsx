@@ -31,6 +31,15 @@ import {
   walkingMinutes,
 } from '../services/places';
 import { getUserLocation } from '../services/location';
+import { isConnectionError } from '../services/http';
+import { useOnline, useOnReconnect } from '../services/network';
+import { peekSession } from '../services/session';
+import {
+  DEFAULT_FILTERS,
+  MapFilters,
+  applyFilters,
+  extraFilterCount,
+} from '../services/mapSearch';
 import {
   BottomSheet,
   Chip,
@@ -38,22 +47,30 @@ import {
   ErrorBox,
   GhostButton,
   IconBag,
+  IconButton,
   IconClock,
   IconCross,
+  IconFilter,
   IconGrid,
+  IconList,
   IconLocate,
   IconMapPin,
   IconNavigation,
   IconPaw,
   IconPhone,
+  IconSearch,
   MapCamera,
   MapCanvas,
   MapMarker,
   MapPoint,
   PrimaryButton,
+  StateView,
   TextButton,
   TopBar,
 } from '../components';
+import { MapFilterSheet } from '../components/map/MapFilterSheet';
+import { MapSearch } from '../components/map/MapSearch';
+import { PlaceListRow } from '../components/map/PlaceListRow';
 import {
   colors,
   fabShadow,
@@ -64,7 +81,6 @@ import {
   type as t,
 } from '../theme';
 
-type Filter = PlaceCategory | 'all';
 type Bounds = [number, number, number, number];
 
 const NEAR_KM = 3;
@@ -228,10 +244,15 @@ export default function MapScreen({ navigation }: MapScreenProps) {
   const interval = cardWidth + CARD_GAP;
   const sheetBottom = Math.max(insets.bottom, 16) + 24;
 
+  const online = useOnline();
+  const [guest] = useState(() => peekSession() === null);
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [filter, setFilter] = useState<Filter>('all');
+  const [loadError, setLoadError] = useState<unknown>(null);
+  const [filters, setFilters] = useState<MapFilters>(DEFAULT_FILTERS);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [listMode, setListMode] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detailId, setDetailId] = useState<number | null>(null);
 
@@ -265,13 +286,11 @@ export default function MapScreen({ navigation }: MapScreenProps) {
 
   const loadPlaces = useCallback(async () => {
     setLoading(true);
-    setErrorMessage(null);
+    setLoadError(null);
     try {
       setPlaces(await fetchPlaces());
     } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : 'No se pudieron cargar los lugares. Intenta de nuevo.'
-      );
+      setLoadError(error ?? new Error('No se pudieron cargar los lugares.'));
     } finally {
       setLoading(false);
     }
@@ -281,23 +300,7 @@ export default function MapScreen({ navigation }: MapScreenProps) {
     loadPlaces();
   }, [loadPlaces]);
 
-  const visible = useMemo(
-    () => (filter === 'all' ? places : places.filter((place) => place.categoria === filter)),
-    [places, filter]
-  );
-
-  const visibleInRegion = useMemo(() => visible.filter(isInRegion), [visible]);
-
-  useEffect(() => {
-    if (loading || errorMessage) return;
-    if (visibleInRegion.length === 0) {
-      focusBounds(MAP_CONFIG.REGION_BOUNDS);
-    } else if (visibleInRegion.length === 1) {
-      focusPoint(placePoint(visibleInRegion[0]), MAP_CONFIG.PLACE_ZOOM);
-    } else {
-      focusBounds(boundsOf(visibleInRegion.map(placePoint)));
-    }
-  }, [visibleInRegion, loading, errorMessage, focusPoint, focusBounds]);
+  useOnReconnect(loadPlaces);
 
   const kmFor = useCallback(
     (place: Place): number | null => {
@@ -309,17 +312,33 @@ export default function MapScreen({ navigation }: MapScreenProps) {
   );
 
   const carousel = useMemo(() => {
-    const withKm = visible.map((place) => ({
+    const withKm = places.map((place) => ({
       place,
       km: kmFor(place),
       inRegion: isInRegion(place),
     }));
-    return withKm.sort((a, b) => {
+    return applyFilters(withKm, filters).sort((a, b) => {
       if (a.km !== null && b.km !== null) return a.km - b.km;
       if (a.inRegion !== b.inRegion) return a.inRegion ? -1 : 1;
       return a.place.nombre.localeCompare(b.place.nombre);
     });
-  }, [visible, kmFor]);
+  }, [places, kmFor, filters]);
+
+  const visible = useMemo(() => carousel.map((item) => item.place), [carousel]);
+
+  const visibleInRegion = useMemo(() => visible.filter(isInRegion), [visible]);
+  const visibleKey = useMemo(() => visibleInRegion.map((place) => place.id).join(','), [visibleInRegion]);
+
+  useEffect(() => {
+    if (loading || loadError) return;
+    if (visibleInRegion.length === 0) {
+      focusBounds(MAP_CONFIG.REGION_BOUNDS);
+    } else if (visibleInRegion.length === 1) {
+      focusPoint(placePoint(visibleInRegion[0]), MAP_CONFIG.PLACE_ZOOM);
+    } else {
+      focusBounds(boundsOf(visibleInRegion.map(placePoint)));
+    }
+  }, [visibleKey, loading, loadError]);
 
   const markers = useMemo<MapMarker[]>(
     () =>
@@ -456,11 +475,20 @@ export default function MapScreen({ navigation }: MapScreenProps) {
     if (place.telefono) Linking.openURL(`tel:${place.telefono.replace(/[^\d+]/g, '')}`);
   };
 
-  const noPlaces = !loading && !errorMessage && places.length === 0;
+  const filtering = filters.category !== 'all' || extraFilterCount(filters) > 0;
+  const noPlaces = !loading && !loadError && places.length === 0;
   const noRegionMatches =
-    !loading && !errorMessage && places.length > 0 && visibleInRegion.length === 0;
-  const hasSheet = carousel.length > 0 && !mapFailed;
+    !loading && !loadError && places.length > 0 && visibleInRegion.length === 0;
+  const hasSheet = carousel.length > 0 && !mapFailed && !listMode;
   const bottomOffset = hasSheet ? sheetHeight : sheetBottom - 24;
+  const extraFilters = extraFilterCount(filters);
+
+  const openDetail = (place: Place) => {
+    setSearchOpen(false);
+    setSelectedId(place.id);
+    setDetailId(place.id);
+    if (!listMode) focusPoint(placePoint(place), MAP_CONFIG.PLACE_ZOOM);
+  };
 
   return (
     <View style={styles.screen}>
@@ -469,18 +497,18 @@ export default function MapScreen({ navigation }: MapScreenProps) {
         <View style={StyleSheet.absoluteFill}>
           {mapFailed ? (
             <View style={styles.mapFailed}>
-              <View style={styles.stateCard}>
-                <View style={styles.stateIcon}>
-                  <IconMapPin size={26} color={colors.teal} />
-                </View>
-                <Text style={[t.cardTitle, { color: colors.ink, textAlign: 'center' }]}>
-                  No se pudo cargar el mapa
-                </Text>
-                <Text style={[t.small, { color: colors.inkSoft, textAlign: 'center' }]}>
-                  Revisa tu conexión a internet e intenta de nuevo.
-                </Text>
-                <GhostButton label="Reintentar" onPress={retryMap} style={{ alignSelf: 'stretch' }} />
-              </View>
+              <StateView
+                pose={online ? 'tranquila' : 'sinConexion'}
+                size={170}
+                title={online ? 'No pudimos cargar el mapa' : 'Sin conexión'}
+                message={
+                  online
+                    ? 'El problema es nuestro, no de tu internet. Inténtalo en un momento.'
+                    : 'Revisa tu internet e inténtalo de nuevo. Tus datos siguen guardados.'
+                }
+                actionLabel="Reintentar"
+                onAction={retryMap}
+              />
             </View>
           ) : (
             <MapCanvas
@@ -498,7 +526,28 @@ export default function MapScreen({ navigation }: MapScreenProps) {
         </View>
 
         <View style={styles.header} onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}>
-          <TopBar title="Mapa veterinario" onBack={goBack} ring />
+          <TopBar
+            title="Mapa"
+            onBack={guest ? goBack : undefined}
+            ring
+            right={
+              <View style={styles.headerActions}>
+                <IconButton label="Buscar un lugar o una comuna" onPress={() => setSearchOpen(true)} ring>
+                  <IconSearch color={colors.ink} />
+                </IconButton>
+                <View>
+                  <IconButton
+                    label={extraFilters > 0 ? `Filtros, ${extraFilters} activos` : 'Filtros'}
+                    onPress={() => setFilterOpen(true)}
+                    ring
+                  >
+                    <IconFilter color={colors.ink} />
+                  </IconButton>
+                  {extraFilters > 0 ? <View style={styles.filterDot} /> : null}
+                </View>
+              </View>
+            }
+          />
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -506,16 +555,18 @@ export default function MapScreen({ navigation }: MapScreenProps) {
           >
             <Chip
               label="Todos"
-              selected={filter === 'all'}
-              onPress={() => setFilter('all')}
+              selected={filters.category === 'all'}
+              onPress={() => setFilters({ ...filters, category: 'all' })}
               icon={(c) => <IconGrid size={18} color={c} />}
             />
             {PLACE_CATEGORIES.map((item) => (
               <Chip
                 key={item.key}
                 label={item.chip}
-                selected={filter === item.key}
-                onPress={() => setFilter(filter === item.key ? 'all' : item.key)}
+                selected={filters.category === item.key}
+                onPress={() =>
+                  setFilters({ ...filters, category: filters.category === item.key ? 'all' : item.key })
+                }
                 icon={FILTER_ICONS[item.key].icon}
                 iconColor={FILTER_ICONS[item.key].color}
               />
@@ -532,10 +583,17 @@ export default function MapScreen({ navigation }: MapScreenProps) {
               </View>
             ) : null}
 
-            {errorMessage ? (
+            {loadError ? (
               <View style={styles.statusCard}>
-                <View style={{ flex: 1 }}>
-                  <ErrorBox message={errorMessage} />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={[t.rowTitle, { color: colors.ink }]}>
+                    {isConnectionError(loadError) ? 'Sin conexión' : 'No pudimos cargar los lugares'}
+                  </Text>
+                  <Text style={[t.small, { color: colors.inkSoft }]}>
+                    {isConnectionError(loadError)
+                      ? 'Revisa tu internet e inténtalo de nuevo.'
+                      : 'Algo falló de nuestro lado. Inténtalo en un momento.'}
+                  </Text>
                 </View>
                 <TextButton label="Reintentar" onPress={loadPlaces} />
               </View>
@@ -546,7 +604,7 @@ export default function MapScreen({ navigation }: MapScreenProps) {
                 <View style={{ flex: 1, gap: 2 }}>
                   <Text style={[t.rowTitle, { color: colors.ink }]}>Aún no hay lugares cargados</Text>
                   <Text style={[t.small, { color: colors.inkSoft }]}>
-                    Cuando se agreguen clínicas y tiendas, aparecerán aquí.
+                    Cuando se agreguen veterinarias y tiendas, aparecerán aquí.
                   </Text>
                 </View>
                 <TextButton label="Actualizar" onPress={loadPlaces} />
@@ -557,20 +615,20 @@ export default function MapScreen({ navigation }: MapScreenProps) {
               <View style={styles.statusCard}>
                 <View style={{ flex: 1, gap: 2 }}>
                   <Text style={[t.rowTitle, { color: colors.ink }]}>
-                    {filter === 'all'
+                    {!filtering
                       ? 'Aún no hay lugares en la región'
-                      : 'Sin lugares de este tipo en la región'}
+                      : 'Sin lugares con estos filtros en la región'}
                   </Text>
                   <Text style={[t.small, { color: colors.inkSoft }]}>
-                    {filter === 'all'
+                    {!filtering
                       ? 'Estamos cargando los de la Región de Valparaíso.'
-                      : 'Prueba con otro tipo o mira todos.'}
+                      : 'Prueba con otro tipo o quita los filtros.'}
                   </Text>
                 </View>
-                {filter === 'all' ? (
+                {!filtering ? (
                   <TextButton label="Actualizar" onPress={loadPlaces} />
                 ) : (
-                  <TextButton label="Ver todos" onPress={() => setFilter('all')} />
+                  <TextButton label="Quitar filtros" onPress={() => setFilters(DEFAULT_FILTERS)} />
                 )}
               </View>
             ) : null}
@@ -586,7 +644,7 @@ export default function MapScreen({ navigation }: MapScreenProps) {
           </View>
         ) : null}
 
-        {!mapFailed ? (
+        {!mapFailed && !listMode ? (
           <Pressable
             onPress={handleLocate}
             disabled={locating}
@@ -606,7 +664,7 @@ export default function MapScreen({ navigation }: MapScreenProps) {
           </Pressable>
         ) : null}
 
-        {!mapFailed ? (
+        {!mapFailed && !listMode ? (
           <Pressable
             onPress={() => Linking.openURL(MAP_CONFIG.COPYRIGHT_URL)}
             accessibilityRole="link"
@@ -625,6 +683,17 @@ export default function MapScreen({ navigation }: MapScreenProps) {
             onLayout={(e) => setSheetHeight(e.nativeEvent.layout.height)}
           >
             <View style={styles.handle} />
+            <View style={styles.sheetHeader}>
+              <Text style={[t.label, { color: colors.inkLabel, flex: 1 }]}>
+                {carousel.length === 1 ? '1 lugar' : `${carousel.length} lugares`}
+                {userLocation ? ' · de más cerca a más lejos' : ''}
+              </Text>
+              <TextButton
+                label="Ver lista"
+                onPress={() => setListMode(true)}
+                icon={<IconList size={18} color={colors.teal} />}
+              />
+            </View>
             <FlatList
               ref={listRef}
               data={carousel}
@@ -655,7 +724,78 @@ export default function MapScreen({ navigation }: MapScreenProps) {
             />
           </View>
         ) : null}
+
+        {listMode && !mapFailed ? (
+          <View style={[styles.listOverlay, { top: headerHeight }]}>
+            <FlatList
+              data={carousel}
+              keyExtractor={(item) => String(item.place.id)}
+              contentContainerStyle={[styles.listContent, { paddingBottom: sheetBottom + 72 }]}
+              ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+              ListHeaderComponent={
+                carousel.length > 0 ? (
+                  <Text style={[t.small, { color: colors.inkSoft, marginBottom: 8 }]}>
+                    {carousel.length === 1 ? '1 lugar' : `${carousel.length} lugares`}
+                    {userLocation ? ' · de más cerca a más lejos' : ''}
+                  </Text>
+                ) : null
+              }
+              ListEmptyComponent={
+                loading ? null : filtering ? (
+                  <StateView
+                    pose="buscando"
+                    size={150}
+                    title="No hay lugares con estos filtros"
+                    message="Prueba con más distancia o quita un filtro."
+                    actionLabel="Quitar filtros"
+                    onAction={() => setFilters(DEFAULT_FILTERS)}
+                    style={{ paddingTop: 24 }}
+                  />
+                ) : (
+                  <StateView
+                    pose="buscando"
+                    size={150}
+                    title="Aún no hay lugares cargados"
+                    message="Cuando se agreguen veterinarias y tiendas, aparecerán aquí."
+                    actionLabel="Actualizar"
+                    onAction={loadPlaces}
+                    style={{ paddingTop: 24 }}
+                  />
+                )
+              }
+              renderItem={({ item }) => (
+                <PlaceListRow place={item.place} km={item.km} onPress={() => openDetail(item.place)} />
+              )}
+            />
+            <View style={[styles.listFooter, { bottom: sheetBottom - 8 }]}>
+              <PrimaryButton
+                label="Ver mapa"
+                onPress={() => setListMode(false)}
+                icon={<IconMapPin size={20} color={colors.onTeal} />}
+                style={{ paddingHorizontal: 28, height: 52, borderRadius: radii.round }}
+              />
+            </View>
+          </View>
+        ) : null}
+
+        {searchOpen ? (
+          <MapSearch
+            places={places}
+            kmFor={kmFor}
+            onClose={() => setSearchOpen(false)}
+            onPick={openDetail}
+          />
+        ) : null}
       </View>
+
+      <MapFilterSheet
+        visible={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        filters={filters}
+        onChange={setFilters}
+        count={carousel.length}
+        hasLocation={userLocation !== null}
+      />
 
       <BottomSheet
         visible={detailPlace !== null}
@@ -721,23 +861,47 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: colors.mint,
+    backgroundColor: colors.ground,
   },
-  stateCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.card,
-    padding: 24,
+  headerActions: {
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  stateIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: radii.tile,
-    backgroundColor: colors.mint,
+  filterDot: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 10,
+    height: 10,
+    borderRadius: radii.round,
+    backgroundColor: colors.teal,
+    borderWidth: 2,
+    borderColor: colors.surface,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingLeft: SIDE,
+    paddingRight: 8,
     marginBottom: 4,
+  },
+  listOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.ground,
+  },
+  listContent: {
+    paddingHorizontal: SIDE,
+    paddingTop: 4,
+  },
+  listFooter: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
   },
   overlayTop: {
     position: 'absolute',

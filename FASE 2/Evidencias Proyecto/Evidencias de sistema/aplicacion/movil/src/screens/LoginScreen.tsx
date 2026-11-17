@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -12,7 +11,9 @@ import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { LoginScreenProps } from '../navigation/types';
 import { loginRequest, getSession, fetchProfileRequest, clearSession } from '../services/auth';
+import { isAuthError } from '../services/http';
 import {
+  Chispa,
   ErrorBox,
   IconMapPin,
   IconPaw,
@@ -39,7 +40,13 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       try {
         const stored = await getSession();
         if (stored?.token) {
-          await fetchProfileRequest(stored.token);
+          try {
+            await fetchProfileRequest(stored.token);
+          } catch (error) {
+            if (isAuthError(error)) {
+              throw error;
+            }
+          }
           if (mounted) {
             navigation.replace('Tabs');
             return;
@@ -91,7 +98,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     return (
       <View style={styles.center}>
         <StatusBar style="dark" />
-        <ActivityIndicator size="large" color={colors.teal} />
+        <Chispa pose="cargando" size={160} />
         <Text style={[t.body, { color: colors.inkSoft, marginTop: 12 }]}>Revisando tu sesión…</Text>
       </View>
     );

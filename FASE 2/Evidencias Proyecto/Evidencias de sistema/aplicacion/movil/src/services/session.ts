@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 
 export interface AuthUser {
   id: number;
@@ -14,11 +15,14 @@ export interface AuthSession {
 
 const TOKEN_KEY = 'meinpets_auth_token';
 const USER_KEY = 'meinpets_auth_user';
+const isWeb = Platform.OS === 'web';
 
 let memorySession: AuthSession | null = null;
+let expiring = false;
+const expiredListeners = new Set<() => void>();
 
 function webStorage(): Storage | null {
-  if (Platform.OS !== 'web' || typeof window === 'undefined') {
+  if (!isWeb || typeof window === 'undefined') {
     return null;
   }
   try {
@@ -28,12 +32,38 @@ function webStorage(): Storage | null {
   }
 }
 
+async function writeItem(key: string, value: string): Promise<void> {
+  if (isWeb) {
+    webStorage()?.setItem(key, value);
+    return;
+  }
+  await SecureStore.setItemAsync(key, value);
+}
+
+async function readItem(key: string): Promise<string | null> {
+  if (isWeb) {
+    return webStorage()?.getItem(key) ?? null;
+  }
+  return SecureStore.getItemAsync(key);
+}
+
+async function removeItem(key: string): Promise<void> {
+  if (isWeb) {
+    webStorage()?.removeItem(key);
+    return;
+  }
+  await SecureStore.deleteItemAsync(key);
+}
+
+export function peekSession(): AuthSession | null {
+  return memorySession;
+}
+
 export async function saveSession(session: AuthSession): Promise<void> {
   memorySession = session;
   try {
-    const storage = webStorage();
-    storage?.setItem(TOKEN_KEY, session.token);
-    storage?.setItem(USER_KEY, JSON.stringify(session.user));
+    await writeItem(TOKEN_KEY, session.token);
+    await writeItem(USER_KEY, JSON.stringify(session.user));
   } catch {
     return;
   }
@@ -45,9 +75,8 @@ export async function getSession(): Promise<AuthSession | null> {
   }
 
   try {
-    const storage = webStorage();
-    const token = storage?.getItem(TOKEN_KEY);
-    const rawUser = storage?.getItem(USER_KEY);
+    const token = await readItem(TOKEN_KEY);
+    const rawUser = await readItem(USER_KEY);
     if (token && rawUser) {
       memorySession = { token, user: JSON.parse(rawUser) as AuthUser };
     }
@@ -61,10 +90,32 @@ export async function getSession(): Promise<AuthSession | null> {
 export async function clearSession(): Promise<void> {
   memorySession = null;
   try {
-    const storage = webStorage();
-    storage?.removeItem(TOKEN_KEY);
-    storage?.removeItem(USER_KEY);
+    await removeItem(TOKEN_KEY);
+    await removeItem(USER_KEY);
   } catch {
     return;
+  }
+}
+
+export function onSessionExpired(listener: () => void): () => void {
+  expiredListeners.add(listener);
+  return () => {
+    expiredListeners.delete(listener);
+  };
+}
+
+export async function expireSession(): Promise<void> {
+  if (expiring) {
+    return;
+  }
+  expiring = true;
+  try {
+    const hadSession = Boolean(await getSession());
+    await clearSession();
+    if (hadSession) {
+      expiredListeners.forEach((listener) => listener());
+    }
+  } finally {
+    expiring = false;
   }
 }

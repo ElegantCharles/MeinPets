@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { RootStackParamList, TabParamList } from './types';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import SessionExpiredScreen from '../screens/SessionExpiredScreen';
 import PetsScreen from '../screens/PetsScreen';
 import PetFormScreen from '../screens/PetFormScreen';
 import PetDetailScreen from '../screens/PetDetailScreen';
@@ -46,6 +47,7 @@ export default function AppNavigator() {
     >
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="SessionExpired" component={SessionExpiredScreen} />
       <Stack.Screen name="Tabs" component={Tabs} />
       <Stack.Screen name="PetForm" component={PetFormScreen} />
       <Stack.Screen name="PetDetail" component={PetDetailScreen} />
