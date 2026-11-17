@@ -221,7 +221,7 @@ Para mantener un historial de versiones limpio y garantizar la estabilidad del c
 
 ---
 
-### 7.2 Nomenclatura de ramas de trabajo
+### 7.2 Nomenclatura de commits
 Todas las ramas de trabajo se deben crear obligatoriamente a partir de **`dev`** y seguir la convención:
 
 `<tipo>/sprint<N>/<descripcion-corta>`
@@ -250,16 +250,8 @@ Todas las ramas de trabajo se deben crear obligatoriamente a partir de **`dev`**
    git push origin <tipo>/sprint<N>/<descripcion-corta>
    ```
 
-3. **Pull Request a `dev`:**
-   - Abre un PR con destino a la rama **`dev`**.
-   - Vincula el PR al Issue correspondiente en GitHub Projects.
-
-4. **Revisión de pares (Code Review):**
-   - Todo PR hacia `dev` requiere la revisión y **aprobación de al menos un integrante del equipo** (Javier, Sebastián o Carlos).
-   - Una vez aprobado, se realiza el merge a `dev` y se elimina la rama temporal.
-
-5. **Pase a producción / entrega final (`dev` ➔ `main`):**
-   - Al finalizar el sprint o hito de entrega, se abre un PR de **`dev` hacia `main`**.
+3. **Pase a producción / entrega final (`dev` ➔ `main`):**
+   - Al finalizar el sprint, se pasa de **`dev` hacia `main`**.
    - Tras la validación final del equipo, se fusiona en `main`.
 
 
